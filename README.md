@@ -93,9 +93,3 @@ git checkout main
 git merge feature/<your-feature-name>
 git push origin main
  ```
-   
-6. **Clean up**
-Remove the temporary test branch once it’s no longer needed
-```
-git branch -d test/<your-feature-name>
-```

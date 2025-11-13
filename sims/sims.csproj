@@ -16,4 +16,15 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="docker\" />
+    <Folder Include="docs\" />
+    <Folder Include="scripts\" />
+    <Folder Include="src\API\Logging\" />
+    <Folder Include="src\App\Models\" />
+    <Folder Include="src\App\Services\" />
+    <Folder Include="src\App\Views\" />
+    <Folder Include="src\Test\" />
+  </ItemGroup>
+
 </Project>

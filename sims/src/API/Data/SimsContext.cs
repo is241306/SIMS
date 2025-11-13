@@ -1,4 +1,6 @@
-﻿namespace sims.Data;
+﻿using sims.Models;
+
+namespace sims.Data;
 using Microsoft.EntityFrameworkCore;
 using sims.Models;
 

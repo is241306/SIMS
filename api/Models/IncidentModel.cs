@@ -19,8 +19,8 @@ public enum IncidentStatus
 public class IncidentModel 
 {
     public int Id { get; set; }
-    public string Title { get; set; }
-    public string Description { get; set; }
+    public string? Title { get; set; }
+    public string? Description { get; set; }
     public IncidentSeverity Severity { get; set; } = IncidentSeverity.Low;
     public IncidentStatus Status { get; set; } = IncidentStatus.Open;
     public string SystemName { get; set; } = "";

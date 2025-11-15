@@ -1,8 +1,8 @@
 # SIMS - Security Incident Management System
-[![Build Status](https://badgen.net/badge/build/passing/green)]()
-[![Docker](https://badgen.net/badge/docker/ready/blue)]()
-[![.NET](https://badgen.net/badge/.NET/8.0/purple)]()
-[![Semgrep](https://badgen.net/badge/SAST/Semgrep/yellow)]()
+[![Build Status](https://img.shields.io/badge/build-passing-green)]()
+[![Docker](https://img.shields.io/badge/docker-ready-blue)]()
+[![.NET](https://img.shields.io/badge/.NET-8.0-purple)]()
+[![Semgrep](https://img.shields.io/badge/SAST-Semgrep-yellow)]()
 
 SIMS is a system for logging and managing IT security incidents. It provides incident tracking, escalation, user management, and secure logging, all running in Docker containers.
 

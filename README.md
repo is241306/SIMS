@@ -28,7 +28,7 @@ SIMS is a system for logging and managing IT security incidents. It provides inc
 - **Databases:** SQL Server (relational), Redis (session/log caching)
 - **Containerization:** Docker (4 containers: App, API, SQL Server, Redis)
 - **Static Analysis:** Semgrep for SAST
-- **Frontend:** <span style="color:red">TBD</span>
+- **Frontend:** MudBlazor Blazor Library
 
 ---
 

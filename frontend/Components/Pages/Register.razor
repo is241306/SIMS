@@ -1,0 +1,38 @@
+@page "/Register"
+@using frontend.Components.Layout
+@layout EmptyLayout
+
+<div class="center-wrapper">
+    <div class="register-container">
+        <div class="content-image">
+            <img id="login_img" src="/img/login.png" alt="Register"/>
+        </div>
+        <div class="content-text">
+            <div class="form-text">
+                <h3>Create your account</h3>
+                <h6>Join your SIMS and manage your service with ease.</h6>
+                
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input id="name" type="text" />
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input id="password" type="password" />
+                </div>
+                
+                <button class="btn-primary-full">Create account</button>
+                
+                <div class="login-text">
+                    Have an account? <a href="/login">Log in</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@code {
+
+}

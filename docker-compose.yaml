@@ -1,0 +1,29 @@
+version: '3.9'
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: api/Dockerfile
+    container_name: sims-api
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ConnectionStrings__DefaultConnection: "Server=db;Database=simsdb;User=sa;Password=SomePass123!;TrustServerCertificate=True;"
+  
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sims-db
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "SomePass123!"
+    volumes:
+      - sims-data:/var/opt/mssql
+
+volumes:
+  sims-data:

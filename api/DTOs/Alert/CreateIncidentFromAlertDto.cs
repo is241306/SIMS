@@ -1,16 +1,17 @@
-﻿namespace api.API.DTOs.Alert;
+﻿using api.Models;
+namespace api.DTOs.Alert;
 
 public class CreateIncidentFromAlertDto
 {
-    public string AlertId { get; set; }
-    public string Description { get; set; } = string.Empty;
-    public string Host { get; set; } = string.Empty;
-    public string User { get; set; } = string.Empty;
-    public string IP { get; set; } = string.Empty;
-    public int AlertLevel { get; set; }
+    
+    public int AlertId { get; set; }
+    public string Source { get; set; } = string.Empty;
+    public string Message { get; set; } = string.Empty;
+    public AlertSeverity Severity { get; set; }  
     public DateTime Timestamp { get; set; } = DateTime.UtcNow;
-        
-    public int? AssignedToUserId { get; set; }
-    public string Status { get; set; } = "New";
-    public int IncidentId { get; set; }
+
+    public string Description { get; set; } = string.Empty;
+    public int ReporterId { get; set; }            
+    public int? AssignedId { get; set; }       
+
 }

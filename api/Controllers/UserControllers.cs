@@ -65,5 +65,7 @@ namespace api.Controllers
             // 201 Created with the new user
             return CreatedAtAction(nameof(GetUsers), new { id = user.Id }, response);
         }
+        
+        
     }
 }

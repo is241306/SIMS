@@ -1,0 +1,114 @@
+.center-wrapper {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+
+.register-container {
+    width: 70vw;
+    height: 60vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    border-radius: 10px;
+    box-shadow: rgba(136, 165, 191, 0.48) 6px 2px 16px 0px,
+    rgba(255, 255, 255, 0.8) -6px -2px 16px 0px;
+
+    column-count: 2;
+}
+
+.content-image{
+    width: 30%;
+    height: 100%;
+}
+
+#login_img{
+    height: 100%;
+    width: 100%;
+    border-radius:  10px 0 0 10px;
+}
+
+.content-text{
+    width: 70%;
+    height: 100%;
+    border-radius: 0 10px 10px 0;
+}
+
+.form-text {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 0.3rem;
+}
+
+h3, h6{
+    color: #050505;
+}
+
+h6{
+    margin-bottom: 3vh;
+}
+
+/*----------Form----------*/
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.8rem;
+    color: #acacac;
+    width: 50%;
+}
+
+.form-group input {
+    padding: 0.55rem 0.75rem;
+    border-radius: 6px;
+    border: 1px solid #d0d0d0;
+    font-size: 0.9rem;
+    outline: none;
+    transition: border-color 0.15s;
+}
+
+.form-group input:focus {
+    border-color: #4caf50;
+}
+
+/*----------Create account----------*/
+.btn-primary-full {
+    margin-top: 1rem;
+    padding: 0.9rem 1rem;
+    width: 50%;
+    border-radius: 999px;
+    border: none;
+    background-color: #5dbb6f;
+    color: white;
+    font-weight: 600;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+.btn-primary-full:hover {
+    filter: brightness(0.95);
+}
+
+/* "Have an account? Log in" */
+.login-text {
+    margin-top: 0.75rem;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #b0b0b0;
+}
+
+.login-text a {
+    color: #4caf50;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.login-text a:hover {
+    text-decoration: none;
+}

@@ -28,5 +28,7 @@ namespace api.Controllers
             _context.SaveChanges();
             return Ok(userModel);
         }
+        
+        
     }
 }

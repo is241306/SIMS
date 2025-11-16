@@ -1,9 +1,9 @@
-﻿namespace api.API.DTOs.Users
+﻿namespace api.DTOs.Users
 {
 
     public class LoginDto
     {
-        public string UserName { get; set; } = string.Empty;
+        public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
     }
 }   

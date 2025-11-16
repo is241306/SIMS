@@ -1,10 +1,12 @@
-﻿namespace api.API.DTOs.Users
+﻿using api.Models;
+
+namespace api.DTOs.Users
 {
 
     public class RegisterDto
     {
         public string Username { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
-        public string Role { get; set; } = string.Empty;
+        public UserRole Role { get; set; } = UserRole.User;
     }
 }

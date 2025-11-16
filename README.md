@@ -65,34 +65,61 @@ docker run --rm -v "C:/temp/SIMS:/src" returntocorp/semgrep semgrep --config aut
 
 Follow these steps to keep the project clean and up to date:
 
-1. **Pull the latest changes**  
+1. **Get newest version of main**  
    Make sure you’re starting from the most recent version of the code.
 ```
+git fetch origin
 git checkout main
-git pull origin main
+git pull --rebase origin main
 ```
 
-2. **Create a new test branch**
-   Use a descriptive name for your branch
+2. **Create a new feature branch**
 ```
 git checkout -b feature/<your-feature-name>
 ```
 
 3. **Implement and test your changes**\
-   Work only in your test branch until everything runs smoothly.
+   Work only in your feature branch until everything runs smoothly.
    Run the tests locally and confirm that nothing else breaks.\
    <br />
 
-4. **Stage and commit changes**
+4. **Implement changes and commit**
 ```
+git status
 git add .
 git commit -m "Describe your changes"
 ```
 
-5. **Merge back into main**
-   Once verified, merge your branch and push to main.
+5. **Keep your feature branch up to date (avoid future conflicts)**\
+   Before pushing or merging, replay your work on top of the latest main:
 ```
+git fetch origin
+git rebase origin/main
+ ```
+   If conflicts appear:
+```
+# Fix the conflicting files manually
+
+git add <fixed-file>
+git rebase --continue
+ ```
+ Repeat until the rebase completes.
+ 
+ 6. **Push your feature branch**
+ ```
+ git push -u origin feature/<your-feature-name>
+ ```
+ 
+ 7. **Merge back to main**
+    1. Open a Pull request in GitHub \
+        ```base: main <-- compare: feature/<your-feature-name>```
+    2. Ensure:
+        - Able to merge
+        - CI checks pass
+        - Merge
+        
+8. **Sync your local main**
+ ```
 git checkout main
-git merge feature/<your-feature-name>
-git push origin main
+git pull --rebase origin main
  ```

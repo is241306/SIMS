@@ -1,12 +1,13 @@
-﻿namespace api.API.DTOs.Alert
+﻿namespace api.DTOs.Alert
 {
     public class AlertDto
     {
-        public string AlertId { get; set; }
+        public string AlertId { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public string Host { get; set; } = string.Empty;
         public string User { get; set; } = string.Empty;
         public string IP { get; set; } = string.Empty;
+        public string Severity { get; set; } = "Low";
         public int AlertLevel { get; set; }
         public DateTime Timestamp { get; set; } = DateTime.UtcNow;
         

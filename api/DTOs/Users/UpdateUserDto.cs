@@ -1,9 +1,11 @@
-﻿namespace api.API.DTOs.Users
+﻿using api.Models;
+
+namespace api.DTOs.Users
 {
 
     public class UpdateUserDto
     {
-        public string? Role { get; set; }
-        public bool? IsActive { get; set; }
+        public UserRole? Role { get; set; }
+        public string? Password { get; set; } 
     }
 }

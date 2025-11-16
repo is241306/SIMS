@@ -1,6 +1,6 @@
 ﻿namespace api.Models;
 
-public enum Severity
+public enum IncidentSeverity
 {
     Low,
     Medium,
@@ -26,7 +26,7 @@ public class Incident
     public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
     public IncidentStatus Status { get; set; } = IncidentStatus.Open;
-    public Severity Severity { get; set; } = Severity.Low;
+    public IncidentSeverity Severity { get; set; } =  IncidentSeverity.Low;
 
     public int? AssignedUserId { get; set; }
     public User? AssignedUser { get; set; }

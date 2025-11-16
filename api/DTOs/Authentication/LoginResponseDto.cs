@@ -1,4 +1,4 @@
-﻿namespace api.API.DTOs.Authentication
+﻿namespace api.DTOs.Authentication
 {
 
     public class LoginResponseDto

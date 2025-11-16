@@ -1,71 +1,62 @@
-﻿using api.API.DTOs.Users;
-using api.Data;
-using api.Models;
+﻿using api.DTOs.Users;
+using api.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class UsersController : ControllerBase
     {
-        private readonly SimsContext _context;
+        private readonly IUserService _userService;
 
-        public UsersController(SimsContext context)
+        public UsersController(IUserService userService)
         {
-            _context = context;
+            _userService = userService;
         }
 
-        // GET /Users
+        // GET api/users
         [HttpGet]
         public async Task<ActionResult<IEnumerable<UserResponseDto>>> GetUsers()
         {
-            var users = await _context.Users
-                .AsNoTracking()
-                .ToListAsync();
-
-            var result = users.Select(u => new UserResponseDto
-            {
-                Id = u.Id,
-                Username = u.Username,
-                // do NOT return real password – leave empty or remove this property from the DTO
-                Password = string.Empty,
-                IsActive = u.IsActive ? "true" : "false"
-            });
-
-            return Ok(result);
+            var users = await _userService.GetAllAsync();
+            return Ok(users);
         }
 
-        // POST /Users  (register/create user)
-        [HttpPost]
-        public async Task<ActionResult<UserResponseDto>> AddUser(RegisterDto dto)
+        // GET api/users/5
+        [HttpGet("{id:int}")]
+        public async Task<ActionResult<UserResponseDto>> GetUser(int id)
         {
-            // map DTO -> domain entity
-            var user = new User
-            {
-                Username = dto.Username,
-                // TODO: hash password instead of storing plain text
-                PasswordHash = dto.Password,
-                IsActive = true
-            };
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            // map entity -> response DTO
-            var response = new UserResponseDto
-            {
-                Id = user.Id,
-                Username = user.Username,
-                Password = string.Empty,     // never send password back
-                IsActive = user.IsActive ? "true" : "false"
-            };
-
-            // 201 Created with the new user
-            return CreatedAtAction(nameof(GetUsers), new { id = user.Id }, response);
+            var user = await _userService.GetByIdAsync(id);
+            if (user == null) return NotFound();
+            return Ok(user);
         }
-        
-        
+
+        // POST api/users/register
+        [HttpPost("register")]
+        public async Task<ActionResult<UserResponseDto>> Register(RegisterDto dto)
+        {
+            var created = await _userService.RegisterAsync(dto);
+            // You can also return CreatedAtAction later
+            return Ok(created);
+        }
+
+        // PUT api/users/5
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> UpdateUser(int id, UpdateUserDto dto)
+        {
+            var updated = await _userService.UpdateAsync(id, dto);
+            if (!updated) return NotFound();
+            return NoContent();
+        }
+
+        // DELETE api/users/5
+        [HttpDelete("{id:int}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            var deleted = await _userService.DeleteAsync(id);
+            if (!deleted) return NotFound();
+            return NoContent();
+        }
     }
 }

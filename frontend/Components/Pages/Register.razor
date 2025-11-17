@@ -1,5 +1,8 @@
 @page "/Register"
 @using frontend.Components.Layout
+@using System.Net.Http.Json
+@using frontend.Models
+@inject IHttpClientFactory HttpFactory
 @layout EmptyLayout
 
 
@@ -12,19 +15,34 @@
             <div class="form-text">
                 <h3>Create your account</h3>
                 <h6>Join your SIMS and manage your service with ease.</h6>
-                
-                <div class="form-group">
-                    <label for="name">Name</label>
-                    <input id="name" type="text" />
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Password</label>
-                    <input id="password" type="password" />
-                </div>
-                
-                <button class="btn-primary-full">Create account</button>
-                
+
+                <EditForm Model="_model" OnValidSubmit="HandleRegister">
+                    <DataAnnotationsValidator/>
+                    <ValidationSummary/>
+
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input id="name" @bind-Value="_model.Username" class="form-control"/>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input id="password" type="password" @bind-Value="_model.Password" class="form-control"/>
+                    </div>
+
+                    <button class="btn-primary-full" type="submit">Create account</button>
+                </EditForm>
+
+                @if (!string.IsNullOrEmpty(_error)){
+                    <div style="color: red; margin-top: 10px;">@_error</div>
+                }
+
+                @if (_success){
+                    <div style="color: green; margin-top: 10px;">
+                        Account created! <a href="/login">Log in</a>
+                    </div>
+                }
+
                 <div class="login-text">
                     Have an account? <a href="/login">Log in</a>
                 </div>
@@ -34,5 +52,37 @@
 </div>
 
 @code {
-    
+    private RegisterModel _model = new();
+    private string? _error;
+    private bool _success;
+
+    private HttpClient ApiClient => HttpFactory.CreateClient("api");
+
+    private async Task HandleRegister() {
+        _error = null;
+        _success = false;
+
+        try{
+            var response = await ApiClient.PostAsJsonAsync("api/auth/register", _model);
+
+            if (response.IsSuccessStatusCode){
+                _success = true;
+            }
+            else{
+                var msg = await response.Content.ReadAsStringAsync();
+                _error = string.IsNullOrWhiteSpace(msg)
+                    ? "Registration failed."
+                    : msg;
+            }
+        }
+        catch (Exception e){
+            _error = $"Error: {e.Message}";
+        }
+    }
+
+    public class RegisterModel {
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = String.Empty;
+    }
+
 }

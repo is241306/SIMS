@@ -111,7 +111,7 @@ git rebase --continue
  ```
  
  7. **Merge back to main**
-    1. Open a Pull request in GitHub \
+    1. Open a Pull request on GitHub website \
         ```base: main <-- compare: feature/<your-feature-name>```
     2. Ensure:
         - Able to merge

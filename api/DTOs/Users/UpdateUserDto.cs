@@ -7,5 +7,8 @@ namespace api.DTOs.Users
     {
         public UserRole? Role { get; set; }
         public string? Password { get; set; } 
+        public List<int>? RoleIds { get; set; }
+        public bool? IsActive { get; set; }
+
     }
 }

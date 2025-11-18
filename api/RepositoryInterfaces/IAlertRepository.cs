@@ -8,5 +8,6 @@ namespace api.Repositories
         Task<IReadOnlyList<Alert>> GetAllAsync();
         Task AddAsync(Alert alert);
         Task DeleteAsync(Alert alert);
+        Task UpdateAsync(Alert alert);
     }
 }

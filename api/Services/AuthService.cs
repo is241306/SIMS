@@ -2,11 +2,12 @@
 using api.Data;
 using api.DTOs.Users;
 using api.Models;
+using api.Services.Interfaces;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 
 namespace api.Services;
 
-public class AuthService {
+public class AuthService : IAuthService {
     private readonly SimsContext _context;
 
     public AuthService(SimsContext context) {
@@ -14,11 +15,9 @@ public class AuthService {
     }
 
     public async Task<bool> RegisterAsync(RegisterDto dto) {
-        //check if user exists
         var existing = _context.Users.FirstOrDefault(u => u.Username == dto.Username);
         if (existing != null) return false;
         
-        //hash password
         var salt = RandomNumberGenerator.GetBytes(16);
         var hash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
             password: dto.Password,

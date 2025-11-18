@@ -38,4 +38,9 @@ public class AlertRepository : IAlertRepository
         _context.Alerts.Remove(alert);
         await _context.SaveChangesAsync();
     }
+    public async Task UpdateAsync(Alert alert)
+    {
+        _context.Alerts.Update(alert);
+        await _context.SaveChangesAsync();
+    }
 }

@@ -43,9 +43,19 @@ namespace api.Services
             var user = await _userRepository.GetByIdAsync(id);
             if (user == null) return false;
 
-            if (dto.Role != null)
-                user.Role = dto.Role;
+            if (dto.RoleIds != null)
+            {
+                user.UserRoles.Clear();
 
+                foreach (var roleId in dto.RoleIds)
+                {
+                    user.UserRoles.Add(new UserRole
+                    {
+                        UserId = user.Id,
+                        RoleId = roleId
+                    });
+                }
+            }
             if (dto.IsActive.HasValue)
                 user.IsActive = dto.IsActive.Value;
 

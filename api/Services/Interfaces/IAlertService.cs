@@ -7,6 +7,8 @@ namespace api.Services.Interfaces
         Task<IEnumerable<AlertDto>> GetAllAsync();
         Task<AlertDto?> GetByIdAsync(int id);
         Task<AlertDto> CreateAsync(AlertDto dto);
+        Task<bool> DeleteAsync(int id);
+        Task<bool> CreateIncidentFromAlertAsync(CreateIncidentFromAlertDto dto);
         Task<bool> EscalateAsync(int id);
     }
 }

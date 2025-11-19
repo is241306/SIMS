@@ -5,5 +5,6 @@ namespace api.Services.Interfaces
     public interface IAuthService
     {
         Task<bool> RegisterAsync(RegisterDto dto);
+        
     }
 }

@@ -34,6 +34,7 @@ public class Program {
         builder.Services.AddScoped<IAlertService, AlertService>();
         builder.Services.AddScoped<IIncidentService, IncidentService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
+        builder.Services.AddScoped<AuthService>();
 
         // ------------------------------
         // API setup
@@ -104,6 +105,11 @@ public class Program {
                 Console.WriteLine($"Database migration failed: {ex.Message}");
             }
 
+        }
+
+        using (var scope = app.Services.CreateScope()){
+            var db = scope.ServiceProvider.GetRequiredService<SimsContext>();
+            db.Database.EnsureCreated();
         }
 
         // ------------------------------

@@ -78,8 +78,31 @@ public class Program {
         using (var scope = app.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<SimsContext>();
-            db.Database.Migrate(); 
-            DbSeeder.Seed(db);
+            
+            try
+            {
+                // Ensure database exists, create if it doesn't
+                if (db.Database.EnsureCreated()) 
+                {
+                    Console.WriteLine("Database created for the first time, applying migrations...");
+                    db.Database.Migrate();
+                }
+                else
+                {
+                    Console.WriteLine("Database already exists, applying pending migrations...");
+                    db.Database.Migrate();
+                }
+
+                // Seed only if Users table is empty
+                if (!db.Users.Any())
+                {
+                    DbSeeder.Seed(db);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Database migration failed: {ex.Message}");
+            }
 
         }
 

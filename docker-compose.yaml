@@ -1,4 +1,4 @@
-version: '3.9'
+#version: '3.9'
 
 services:
   api:
@@ -25,5 +25,24 @@ services:
     volumes:
       - sims-data:/var/opt/mssql
 
+  redis:
+    image: redis:7-alpine
+    container_name: sims-redis
+    ports:
+      - "6379:6379"   # optional: remove if you don't want host access
+    volumes:
+      - redis-data:/data
+      # - ./redis.conf:/usr/local/etc/redis/redis.conf   # optional custom config
+    command: ["redis-server"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    environment:
+      Redis__Connection: "redis:6379"
+
+
 volumes:
   sims-data:
+  redis-data:

@@ -16,22 +16,19 @@
                 <h3>Create your account</h3>
                 <h6>Join your SIMS and manage your service with ease.</h6>
 
-                <EditForm Model="_model" OnValidSubmit="HandleRegister">
-                    <DataAnnotationsValidator/>
-                    <ValidationSummary/>
+                <div class="form-group">
+                    <label for="name">Name</label>
+                    <input id="name" type="text" @bind="_model.Username"/>
+                </div>
 
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input id="name" @bind-Value="_model.Username" class="form-control"/>
-                    </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input id="password" type="password" @bind="_model.Password"/>
+                </div>
 
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input id="password" type="password" @bind-Value="_model.Password" class="form-control"/>
-                    </div>
-
-                    <button class="btn-primary-full" type="submit">Create account</button>
-                </EditForm>
+                <button class="btn-primary-full" type="button" @onclick="HandleRegister" disabled="@_loading">
+                    Create account
+                </button>
 
                 @if (!string.IsNullOrEmpty(_error)){
                     <div style="color: red; margin-top: 10px;">@_error</div>
@@ -55,12 +52,14 @@
     private RegisterModel _model = new();
     private string? _error;
     private bool _success;
+    private bool _loading;
 
     private HttpClient ApiClient => HttpFactory.CreateClient("api");
 
     private async Task HandleRegister() {
         _error = null;
         _success = false;
+        _loading = true;
 
         try{
             var response = await ApiClient.PostAsJsonAsync("api/auth/register", _model);
@@ -78,11 +77,15 @@
         catch (Exception e){
             _error = $"Error: {e.Message}";
         }
+        /*finally{
+            _loading = false;
+            Console.WriteLine("debug");
+        }*/
     }
 
     public class RegisterModel {
         public string Username { get; set; } = string.Empty;
-        public string Password { get; set; } = String.Empty;
+        public string Password { get; set; } = string.Empty;
     }
 
 }

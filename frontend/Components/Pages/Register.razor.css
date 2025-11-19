@@ -21,7 +21,7 @@
 }
 
 .content-image{
-    width: 30%;
+    width: 35%;
     height: 100%;
 }
 
@@ -32,7 +32,7 @@
 }
 
 .content-text{
-    width: 70%;
+    width: 65%;
     height: 100%;
     border-radius: 0 10px 10px 0;
 }
@@ -93,6 +93,11 @@ h6{
 
 .btn-primary-full:hover {
     filter: brightness(0.95);
+}
+
+.edit-form{
+    width: 100px;
+    background-color: tomato;
 }
 
 /* "Have an account? Log in" */

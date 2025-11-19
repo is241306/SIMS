@@ -41,6 +41,17 @@ public class Program {
         var app = builder.Build();
 
         // ------------------------------
+        //  MIGRATION 
+        // ------------------------------
+        using (var scope = app.Services.CreateScope())
+        {
+            var db = scope.ServiceProvider.GetRequiredService<SimsContext>();
+            db.Database.Migrate(); 
+            DbSeeder.Seed(db);
+
+        }
+
+        // ------------------------------
         // Middleware
         // ------------------------------
         if (app.Environment.IsDevelopment()) {

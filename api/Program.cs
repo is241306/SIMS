@@ -3,9 +3,13 @@ using api.Repositories;
 using api.Services;
 using api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
+using System.Threading.Tasks;
+
+
 
 public class Program {
-    public static void Main(string[] args) {
+    public static async Task Main(string[] args) {
         var builder = WebApplication.CreateBuilder(args);
 
         // ------------------------------
@@ -37,8 +41,36 @@ public class Program {
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+        
+        // Redis 
+        builder.Services.AddStackExchangeRedisCache(options =>
+        {
+            options.Configuration = builder.Configuration["Redis:Connection"];
+        });
+        
+        
+        var redis = ConnectionMultiplexer.Connect(builder.Configuration["Redis:Connection"]);
+        builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
+        // Register the interface with the concrete service
+        builder.Services.AddSingleton<IRedisLogService, RedisLogService>();
+
+        
+        
         var app = builder.Build();
+        
+        using (var scope = app.Services.CreateScope())
+        {
+            var redisLogService = scope.ServiceProvider.GetRequiredService<IRedisLogService>();
+
+            // Check if there are already logs
+            var existingLogs = await redisLogService.GetLatestLogsAsync(1);
+            if (existingLogs.Length == 0)
+            {
+                // Add initial log entry
+                await redisLogService.LogAsync("INFO", "Initial log entry", new { CreatedAt = DateTime.UtcNow });
+            }
+        }
 
         // ------------------------------
         //  MIGRATION 

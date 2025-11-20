@@ -4,6 +4,10 @@ using api.Services;
 using api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+
 
 public class Program {
     public static async Task Main(string[] args) {
@@ -39,6 +43,38 @@ public class Program {
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
+
+        // ------------------------------
+        // JWT Authentication
+        // ------------------------------
+
+        var jwtSection = builder.Configuration.GetSection("Jwt");
+        var jwtKey = jwtSection["Key"];
+        var jwtIssuer = jwtSection["Issuer"];
+        var jwtAudience = jwtSection["Audience"];
+
+        if (string.IsNullOrWhiteSpace(jwtKey))
+            throw new InvalidOperationException("Jwt:Key is missing");
+
+        var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+
+        builder.Services
+            .AddAuthentication(options => {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+            .AddJwtBearer(options => {
+                options.TokenValidationParameters = new TokenValidationParameters {
+                    ValidIssuer = jwtIssuer,
+                    ValidAudience = jwtAudience,
+                    IssuerSigningKey = signingKey,
+                    ValidateIssuer = !string.IsNullOrWhiteSpace(jwtIssuer),
+                    ValidateAudience = !string.IsNullOrWhiteSpace(jwtAudience),
+                    ValidateIssuerSigningKey = true,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.FromDays(1)
+                };
+            });
 
         // ------------------------------
         // Redis 
@@ -97,6 +133,8 @@ public class Program {
         }
 
         app.UseHttpsRedirection();
+        app.UseAuthentication();
+
         app.MapControllers();
         app.Run();
     }

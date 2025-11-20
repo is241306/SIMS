@@ -32,15 +32,6 @@ namespace api.Controllers
             return Ok(user);
         }
 
-        // POST api/users/register
-        [HttpPost("register")]
-        public async Task<ActionResult<UserResponseDto>> Register(RegisterDto dto)
-        {
-            var created = await _userService.RegisterAsync(dto);
-            // You can also return CreatedAtAction later
-            return Ok(created);
-        }
-
         // PUT api/users/5
         [HttpPut("{id:int}")]
         public async Task<IActionResult> UpdateUser(int id, UpdateUserDto dto)

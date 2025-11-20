@@ -1,32 +1,52 @@
 @page "/Login"
+@rendermode InteractiveServer
 @using frontend.Components.Layout
+@using System.Net.Http.Json
+@inject IHttpClientFactory HttpFactory
+@inject NavigationManager Nav
+@inject frontend.Services.AuthClientService Auth
 @layout EmptyLayout
 
 
 <div class="center-wrapper">
     <div class="register-container">
         <div class="content-image">
-            <img id="login_img" src="/img/login.png" alt="Register"/>
+            <img id="login_img" src="/img/login.png" alt="Login"/>
         </div>
         <div class="content-text">
             <div class="form-text">
                 <h3>Log in your account</h3>
                 <h6>Welcome back!</h6>
-                
+
                 <div class="form-group">
                     <label for="name">Name</label>
-                    <input id="name" type="text" />
+                    <input id="name" type="text" @bind="_model.Username"/>
                 </div>
-                
+
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input id="password" type="password" />
+                    <input id="password" type="password" @bind="_model.Password"/>
                 </div>
-                
-                <button class="btn-primary-full">Login</button>
-                
+
+                <button class="btn-primary-full"
+                        type="button"
+                        @onclick="HandleLogin"
+                        disabled="@_loading">
+                    @(_loading ? "Logging in..." : "Login")
+                </button>
+
+                @if (!string.IsNullOrEmpty(_error)){
+                    <div style="color: red; margin-top: 10px;">@_error</div>
+                }
+
+                @if (_success && _loginResult is not null){
+                    <div style="color: green; margin-top: 10px;">
+                        Welcome, @_loginResult.Username (Role: @_loginResult.Role)
+                    </div>
+                }
+
                 <div class="login-text">
-                    No account yet? <a href="/login">Register</a>
+                    No account yet? <a href="/Register">Register</a>
                 </div>
             </div>
         </div>
@@ -34,5 +54,60 @@
 </div>
 
 @code {
-    
+    private LoginModel _model = new();
+    private string? _error;
+    private bool _success;
+    private bool _loading;
+    private LoginResponse? _loginResult;
+
+    private HttpClient ApiClient => HttpFactory.CreateClient("api");
+
+    private async Task HandleLogin() {
+        _error = null;
+        _success = false;
+        _loginResult = null;
+        _loading = true;
+
+        try{
+            var response = await ApiClient.PostAsJsonAsync("api/auth/login", _model);
+
+            if (response.IsSuccessStatusCode){
+                _loginResult = await response.Content.ReadFromJsonAsync<LoginResponse>();
+
+                if (_loginResult is null || string.IsNullOrWhiteSpace(_loginResult.Token)){
+                    _error = "Login failed: invalid response from server.";
+                }
+                else{
+                    await Auth.SetLoginAsync(_loginResult.Token, _loginResult.Username, _loginResult.Role);
+                    _success = true;
+                    Nav.NavigateTo("/Dashboard");
+                }
+            }
+            else{
+                var msg = await response.Content.ReadAsStringAsync();
+                _error = string.IsNullOrWhiteSpace(msg)
+                    ? "Login failed. Please check your credentials."
+                    : msg;
+            }
+        }
+        catch (Exception e){
+            _error = $"Error: {e.Message}";
+        }
+        finally{
+            _loading = false;
+        }
+    }
+
+    public class LoginModel {
+        public string Username { get; set; } = string.Empty;
+        public string Password { get; set; } = string.Empty;
+    }
+
+    public class LoginResponse {
+        public string Token { get; set; } = string.Empty;
+        public DateTime ExpiresAt { get; set; }
+        public string Username { get; set; } = string.Empty;
+        public string Role { get; set; } = string.Empty;
+    }
+
 }

@@ -10,6 +10,8 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddHttpClient("api", client => { client.BaseAddress = new Uri(apiBaseUrl); });
 
+builder.Services.AddScoped<frontend.Services.AuthClientService>();
+
 builder.Services.AddScoped(sp =>
     sp.GetRequiredService<IHttpClientFactory>().CreateClient("api"));
 

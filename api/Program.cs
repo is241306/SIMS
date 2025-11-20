@@ -4,9 +4,6 @@ using api.Services;
 using api.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
-using System.Threading.Tasks;
-
-
 
 public class Program {
     public static async Task Main(string[] args) {
@@ -42,80 +39,59 @@ public class Program {
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
-        
-        // Redis 
-        builder.Services.AddStackExchangeRedisCache(options =>
-        {
-            options.Configuration = builder.Configuration["Redis:Connection"];
-        });
-        
-        
-        var redis = ConnectionMultiplexer.Connect(builder.Configuration["Redis:Connection"]);
-        builder.Services.AddSingleton<IConnectionMultiplexer>(redis);
 
-        // Register the interface with the concrete service
+        // ------------------------------
+        // Redis 
+        // ------------------------------
+        var redisConnection = builder.Configuration["Redis:Connection"];
+
+        if (string.IsNullOrWhiteSpace(redisConnection))
+            throw new InvalidOperationException("Redis:Connection missing. Set Redis__Connection in docker-compose.");
+
+        builder.Services.AddStackExchangeRedisCache(options => { options.Configuration = redisConnection; });
+
+        builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+            ConnectionMultiplexer.Connect(redisConnection + ",abortConnect=false"));
+
         builder.Services.AddSingleton<IRedisLogService, RedisLogService>();
 
-        
-        
+
         var app = builder.Build();
-        
-        using (var scope = app.Services.CreateScope())
-        {
-            var redisLogService = scope.ServiceProvider.GetRequiredService<IRedisLogService>();
-
-            // Check if there are already logs
-            var existingLogs = await redisLogService.GetLatestLogsAsync(1);
-            if (existingLogs.Length == 0)
-            {
-                // Add initial log entry
-                await redisLogService.LogAsync("INFO", "Initial log entry", new { CreatedAt = DateTime.UtcNow });
-            }
-        }
 
         // ------------------------------
-        //  MIGRATION 
+        // Apply EF Core Migrations
         // ------------------------------
-        using (var scope = app.Services.CreateScope())
-        {
-            var db = scope.ServiceProvider.GetRequiredService<SimsContext>();
-            
-            try
-            {
-                // Ensure database exists, create if it doesn't
-                if (db.Database.EnsureCreated()) 
-                {
-                    Console.WriteLine("Database created for the first time, applying migrations...");
-                    db.Database.Migrate();
-                }
-                else
-                {
-                    Console.WriteLine("Database already exists, applying pending migrations...");
-                    db.Database.Migrate();
-                }
-
-                // Seed only if Users table is empty
-                if (!db.Users.Any())
-                {
-                    DbSeeder.Seed(db);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Database migration failed: {ex.Message}");
-            }
-
-        }
-
         using (var scope = app.Services.CreateScope()){
-            var db = scope.ServiceProvider.GetRequiredService<SimsContext>();
-            db.Database.EnsureCreated();
+            try{
+                var db = scope.ServiceProvider.GetRequiredService<SimsContext>();
+                db.Database.Migrate();
+            }
+            catch (Exception ex){
+                Console.WriteLine($"Migration failed: {ex.Message}");
+                throw;
+            }
+        }
+
+        // ------------------------------
+        // Seed Redis Log
+        // ------------------------------
+        using (var scope = app.Services.CreateScope()){
+            try{
+                var redisLog = scope.ServiceProvider.GetRequiredService<IRedisLogService>();
+                var existing = await redisLog.GetLatestLogsAsync(1);
+
+                if (existing.Length == 0)
+                    await redisLog.LogAsync("INFO", "Initial log entry", new { CreatedAt = DateTime.UtcNow });
+            }
+            catch (Exception ex){
+                Console.WriteLine($"Redis logging failed (likely Redis not ready yet): {ex.Message}");
+            }
         }
 
         // ------------------------------
         // Middleware
         // ------------------------------
-        if (app.Environment.IsDevelopment()) {
+        if (app.Environment.IsDevelopment()){
             app.UseSwagger();
             app.UseSwaggerUI();
         }

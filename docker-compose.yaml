@@ -10,9 +10,13 @@ services:
       - "8080:8080"
     depends_on:
       - db
+      - redis
     environment:
       ASPNETCORE_ENVIRONMENT: Development
       ConnectionStrings__DefaultConnection: "Server=db;Database=simsdb;User=sa;Password=SomePass123!;TrustServerCertificate=True;"
+      Redis__Connection: "redis:6379,abortConnect=false"
+    networks:
+      - sims-net
 
   db:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -24,24 +28,41 @@ services:
       SA_PASSWORD: "SomePass123!"
     volumes:
       - sims-data:/var/opt/mssql
+    networks:
+      - sims-net
 
   redis:
     image: redis:7-alpine
     container_name: sims-redis
     ports:
-      - "6379:6379"   # optional: remove if you don't want host access
+      - "6379:6379"
     volumes:
       - redis-data:/data
-      # - ./redis.conf:/usr/local/etc/redis/redis.conf   # optional custom config
-    command: ["redis-server"]
+    command: [ "redis-server" ]
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - sims-net
+  
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sims-frontend
+    ports:
+      - "5186:8080"
+    depends_on:
+      - api
     environment:
-      Redis__Connection: "redis:6379"
+      ApiBaseUrl: "http://api:8080"
+    networks:
+      - sims-net
 
+networks:
+  sims-net:
 
 volumes:
   sims-data:

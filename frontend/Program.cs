@@ -1,26 +1,27 @@
 using frontend.Components;
 
-
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+var apiBaseUrl = builder.Configuration["ApiBaseUrl"]
+                 ?? "http://api:8080";
+
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddHttpClient("api", client => {
-    client.BaseAddress = new Uri("http://localhost:8080");
-});
+builder.Services.AddHttpClient("api", client => { client.BaseAddress = new Uri(apiBaseUrl); });
+
+builder.Services.AddScoped(sp =>
+    sp.GetRequiredService<IHttpClientFactory>().CreateClient("api"));
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// 2. Middleware
 if (!app.Environment.IsDevelopment()){
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();

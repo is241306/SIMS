@@ -1,0 +1,444 @@
+@page "/incidents"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Incidents - SIMS</PageTitle>
+
+<div class="page-wrapper">
+    <div class="page-header">
+        <h1>📋 Incidents Management</h1>
+        <button class="btn-create" @onclick="CreateIncident">+ New Incident</button>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters-card">
+        <div class="filter-group">
+            <label>Status</label>
+            <select @bind="filterStatus" @bind:event="onchange" class="filter-select">
+                <option value="">All</option>
+                <option value="New">New</option>
+                <option value="Open">Open</option>
+                <option value="InProgress">Investigating</option>
+                <option value="Resolved">Resolved</option>
+                <option value="Escalated">Escalated</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>Severity</label>
+            <select @bind="filterSeverity" @bind:event="onchange" class="filter-select">
+                <option value="">All</option>
+                <option value="Critical">Critical</option>
+                <option value="High">High</option>
+                <option value="Medium">Medium</option>
+                <option value="Low">Low</option>
+            </select>
+        </div>
+        <button class="btn-reset" @onclick="ResetFilters">Reset</button>
+    </div>
+
+    <!-- Incidents Table -->
+    <div class="content-card">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Description</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                    <th>Assigned To</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (filteredIncidents == null)
+                {
+                    <tr><td colspan="7" class="loading">Loading...</td></tr>
+                }
+                else if (!filteredIncidents.Any())
+                {
+                    <tr><td colspan="7" class="no-data">No incidents found</td></tr>
+                }
+                else
+                {
+                    @foreach (var incident in filteredIncidents)
+                    {
+                        <tr class="table-row">
+                            <td class="incident-id" @onclick="() => ViewDetails(incident.Id)">IN@incident.Id</td>
+                            <td @onclick="() => ViewDetails(incident.Id)">@incident.Description</td>
+                            <td>
+                                <span class="severity-badge severity-@incident.Severity.ToString().ToLower()">
+                                    @incident.Severity
+                                </span>
+                            </td>
+                            <td>
+                                <select class="status-select status-@incident.Status.ToString().ToLower()" 
+                                        value="@incident.Status" 
+                                        @onchange="@(async (e) => await ChangeStatus(incident.Id, e.Value?.ToString() ?? string.Empty))">
+                                    <option value="New">New</option>
+                                    <option value="Open">Open</option>
+                                    <option value="InProgress">Investigating</option>
+                                    <option value="Resolved">Resolved</option>
+                                    <option value="Escalated">Escalated</option>
+                                </select>
+                            </td>
+                            <td>
+                                <select class="assign-select" 
+                                        value="@(incident.AssignedId ?? 0)" 
+                                        @onchange="@(async (e) => await AssignUser(incident.Id, int.Parse(e.Value?.ToString() ?? "0")))">
+                                    <option value="0">Unassigned</option>
+                                    @foreach (var user in users)
+                                    {
+                                        <option value="@user.Id">@user.Name</option>
+                                    }
+                                </select>
+                            </td>
+                            <td>@incident.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn-action btn-view" @onclick="() => ViewDetails(incident.Id)" title="View Details">
+                                        👁️
+                                    </button>
+                                    <button class="btn-action btn-edit" @onclick="() => EditIncident(incident.Id)" title="Edit">
+                                        ✏️
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    :root {
+        --color-primary: #113B40;
+        --color-success: #038C3E;
+        --color-bg: #F2F2F2;
+        --color-white: #FFFFFF;
+        --severity-critical: #E3342F;
+        --severity-high: #3B82F6;
+        --severity-medium: #FACC15;
+        --severity-low: #9CA3AF;
+    }
+
+    .page-wrapper {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        background: var(--color-bg);
+        min-height: 100vh;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        color: var(--color-primary);
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .btn-create {
+        padding: 0.75rem 1.5rem;
+        background: var(--color-success);
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-create:hover {
+        background: #41BF78;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(3, 140, 62, 0.3);
+    }
+
+    .filters-card {
+        background: var(--color-white);
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+        align-items: end;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .filter-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .filter-group label {
+        font-weight: 600;
+        font-size: 0.875rem;
+        color: var(--color-primary);
+    }
+
+    .filter-select {
+        padding: 0.5rem 1rem;
+        border: 1px solid #E0E0E0;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        min-width: 150px;
+    }
+
+    .btn-reset {
+        padding: 0.5rem 1.5rem;
+        background: #6B7280;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .content-card {
+        background: var(--color-white);
+        border-radius: 12px;
+        padding: 1.5rem;
+        overflow-x: auto;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th {
+        text-align: left;
+        padding: 1rem;
+        background: var(--color-bg);
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        color: var(--color-primary);
+    }
+
+    .data-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #E0E0E0;
+    }
+
+    .table-row:hover {
+        background: var(--color-bg);
+    }
+
+    .incident-id {
+        font-weight: 700;
+        color: var(--color-primary);
+        cursor: pointer;
+    }
+
+    .incident-id:hover {
+        text-decoration: underline;
+    }
+
+    .severity-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .severity-critical {
+        background: #FEE2E2;
+        color: var(--severity-critical);
+    }
+
+    .severity-high {
+        background: #DBEAFE;
+        color: var(--severity-high);
+    }
+
+    .severity-medium {
+        background: #FEF3C7;
+        color: #92400E;
+    }
+
+    .severity-low {
+        background: #F3F4F6;
+        color: var(--severity-low);
+    }
+
+    .status-select, .assign-select {
+        padding: 0.5rem;
+        border: 1px solid #E0E0E0;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .status-select:hover, .assign-select:hover {
+        border-color: var(--color-primary);
+    }
+
+    .status-new { color: #6B7280; }
+    .status-open { color: #3B82F6; }
+    .status-inprogress { color: #F59E0B; }
+    .status-resolved { color: #038C3E; }
+    .status-escalated { color: #E3342F; }
+
+    .action-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-action {
+        padding: 0.5rem;
+        border: none;
+        background: transparent;
+        font-size: 1.25rem;
+        cursor: pointer;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+
+    .btn-action:hover {
+        background: var(--color-bg);
+        transform: scale(1.1);
+    }
+
+    .loading, .no-data {
+        text-align: center;
+        padding: 3rem;
+        color: #6B7280;
+    }
+</style>
+
+@code {
+    private List<IncidentDto>? incidents;
+    private List<IncidentDto>? filteredIncidents;
+    private List<UserDto> users = new();
+    
+    private string _filterStatus = "";
+    private string filterStatus 
+    { 
+        get => _filterStatus; 
+        set { _filterStatus = value; ApplyFilters(); } 
+    }
+    
+    private string _filterSeverity = "";
+    private string filterSeverity 
+    { 
+        get => _filterSeverity; 
+        set { _filterSeverity = value; ApplyFilters(); } 
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            incidents = await Http.GetFromJsonAsync<List<IncidentDto>>("api/incidents");
+            
+            // Placeholder users
+            users = new List<UserDto>
+            {
+                new() { Id = 1, Name = "John Doe" },
+                new() { Id = 2, Name = "Jane Smith" },
+                new() { Id = 3, Name = "Bob Johnson" }
+            };
+            
+            ApplyFilters();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private void ApplyFilters()
+    {
+        filteredIncidents = incidents?.Where(i =>
+            (string.IsNullOrEmpty(filterStatus) || i.Status.ToString() == filterStatus) &&
+            (string.IsNullOrEmpty(filterSeverity) || i.Severity.ToString() == filterSeverity)
+        ).ToList();
+    }
+
+    private void ResetFilters()
+    {
+        filterStatus = "";
+        filterSeverity = "";
+        ApplyFilters();
+    }
+
+    private async Task ChangeStatus(int id, string newStatus)
+    {
+        try
+        {
+            await Http.PutAsync($"api/incidents/{id}/status?status={newStatus}", null);
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private async Task AssignUser(int incidentId, int userId)
+    {
+        try
+        {
+            await Http.PutAsync($"api/incidents/{incidentId}/assign?userId={userId}", null);
+            await LoadData();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+        }
+    }
+
+    private void ViewDetails(int id)
+    {
+        Navigation.NavigateTo($"/incidents/{id}");
+    }
+
+    private void EditIncident(int id)
+    {
+        Navigation.NavigateTo($"/incidents/{id}/edit");
+    }
+
+    private void CreateIncident()
+    {
+        Navigation.NavigateTo("/incidents/create");
+    }
+
+    public class IncidentDto
+    {
+        public int Id { get; set; }
+        public string Description { get; set; } = "";
+        public DateTime CreatedAt { get; set; }
+        public IncidentStatus Status { get; set; }
+        public IncidentSeverity Severity { get; set; }
+        public int? AssignedId { get; set; }
+    }
+
+    public class UserDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
+    }
+
+    public enum IncidentStatus { New, Open, InProgress, Resolved, Escalated }
+    public enum IncidentSeverity { Low, Medium, High, Critical }
+}

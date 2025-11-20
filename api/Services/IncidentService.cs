@@ -29,6 +29,37 @@ namespace api.Services
             return incident == null ? null : MapToDto(incident);
         }
 
+        public async Task<IncidentDto> CreateAsync(CreateIncidentDto dto)
+        {
+            var incident = new Incident
+            {
+                Description = dto.Description,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                Severity = Enum.Parse<IncidentSeverity>(dto.Severity),
+                Status = Enum.Parse<IncidentStatus>(dto.Status),
+                AssignedUserId = dto.AssignedId > 0 ? dto.AssignedId : null
+            };
+
+            await _incidentRepository.AddAsync(incident);
+            return MapToDto(incident);
+        }
+
+        public async Task<bool> UpdateAsync(int id, UpdateIncidentDto dto)
+        {
+            var incident = await _incidentRepository.GetByIdAsync(id);
+            if (incident == null)
+                return false;
+
+            incident.Description = dto.Description;
+            incident.Severity = Enum.Parse<IncidentSeverity>(dto.Severity);
+            incident.Status = Enum.Parse<IncidentStatus>(dto.Status);
+            incident.AssignedUserId = dto.AssignedId > 0 ? dto.AssignedId : null;
+            incident.UpdatedAt = DateTime.UtcNow;
+
+            await _incidentRepository.UpdateAsync(incident);
+            return true;
+        }
         
         public async Task<IncidentDto> CreateFromAlertAsync(CreateIncidentFromAlertDto dto)
         {

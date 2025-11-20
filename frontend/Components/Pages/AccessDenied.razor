@@ -1,0 +1,100 @@
+@page "/access-denied"
+@inject NavigationManager Navigation
+
+<PageTitle>Access Denied - SIMS</PageTitle>
+
+<div class="access-denied-wrapper">
+    <div class="access-denied-container">
+        <div class="icon">🚫</div>
+        <h1>Access Denied</h1>
+        <p>You don't have permission to access this resource.</p>
+        <p class="subtitle">Please contact your administrator if you believe this is an error.</p>
+        <div class="actions">
+            <button class="btn-primary" @onclick="GoBack">Go Back</button>
+            <button class="btn-secondary" @onclick="GoHome">Go to Dashboard</button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .access-denied-wrapper {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #F2F2F2;
+        padding: 2rem;
+    }
+
+    .access-denied-container {
+        background: white;
+        border-radius: 16px;
+        padding: 3rem;
+        max-width: 500px;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .icon {
+        font-size: 5rem;
+        margin-bottom: 1rem;
+    }
+
+    h1 {
+        color: #113B40;
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        color: #7F8C8D;
+        margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+        font-size: 0.875rem;
+        margin-bottom: 2rem;
+    }
+
+    .actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+    }
+
+    .btn-primary, .btn-secondary {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: #113B40;
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #E0E0E0;
+        color: #113B40;
+    }
+
+    .btn-primary:hover, .btn-secondary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+</style>
+
+@code {
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/", forceLoad: true);
+    }
+
+    private void GoHome()
+    {
+        Navigation.NavigateTo("/dashboard");
+    }
+}

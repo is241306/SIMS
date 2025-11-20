@@ -1,0 +1,606 @@
+@page "/dashboard"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Dashboard - SIMS</PageTitle>
+
+<div class="dashboard-wrapper">
+    <div class="dashboard-header">
+        <h1>🛡️ SIMS Dashboard</h1>
+        <div class="header-actions">
+            <span class="last-update">Last updated: @DateTime.Now.ToString("HH:mm:ss")</span>
+        </div>
+    </div>
+
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card primary">
+            <div class="stat-icon">📋</div>
+            <div class="stat-content">
+                <div class="stat-number">@openIncidents</div>
+                <div class="stat-label">Open Incidents</div>
+            </div>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-icon">🔔</div>
+            <div class="stat-content">
+                <div class="stat-number">@newAlerts</div>
+                <div class="stat-label">New Alerts</div>
+            </div>
+        </div>
+        <div class="stat-card danger">
+            <div class="stat-icon">⚠️</div>
+            <div class="stat-content">
+                <div class="stat-number">@criticalCount</div>
+                <div class="stat-label">Critical Issues</div>
+            </div>
+        </div>
+        <div class="stat-card info">
+            <div class="stat-icon">✅</div>
+            <div class="stat-content">
+                <div class="stat-number">@resolvedToday</div>
+                <div class="stat-label">Resolved Today</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Severity Distribution Chart -->
+    <div class="content-card">
+        <div class="card-header">
+            <h2>Severity Distribution</h2>
+        </div>
+        <div class="severity-chart">
+            <div class="chart-bar">
+                <div class="bar-label">Critical</div>
+                <div class="bar-wrapper">
+                    <div class="bar bar-critical" style="width: @GetPercentage(criticalCount)%">
+                        <span class="bar-text">@criticalCount</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-bar">
+                <div class="bar-label">High</div>
+                <div class="bar-wrapper">
+                    <div class="bar bar-high" style="width: @GetPercentage(highCount)%">
+                        <span class="bar-text">@highCount</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-bar">
+                <div class="bar-label">Medium</div>
+                <div class="bar-wrapper">
+                    <div class="bar bar-medium" style="width: @GetPercentage(mediumCount)%">
+                        <span class="bar-text">@mediumCount</span>
+                    </div>
+                </div>
+            </div>
+            <div class="chart-bar">
+                <div class="bar-label">Low</div>
+                <div class="bar-wrapper">
+                    <div class="bar bar-low" style="width: @GetPercentage(lowCount)%">
+                        <span class="bar-text">@lowCount</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+        <button class="action-btn primary" @onclick="ViewAllIncidents">
+            <span class="btn-icon">📋</span>
+            <span>View All Incidents</span>
+        </button>
+        <button class="action-btn success" @onclick="ViewAllAlerts">
+            <span class="btn-icon">🔔</span>
+            <span>View All Alerts</span>
+        </button>
+    </div>
+
+    <!-- Recent Incidents -->
+    <div class="content-card">
+        <div class="card-header">
+            <h2>Recent Incidents</h2>
+            <a href="/incidents" class="link-view-all">View All →</a>
+        </div>
+        <div class="table-container">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Description</th>
+                        <th>Severity</th>
+                        <th>Status</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (recentIncidents == null)
+                    {
+                        <tr><td colspan="5" class="loading">Loading...</td></tr>
+                    }
+                    else if (!recentIncidents.Any())
+                    {
+                        <tr><td colspan="5" class="no-data">No incidents</td></tr>
+                    }
+                    else
+                    {
+                        @foreach (var incident in recentIncidents.Take(5))
+                        {
+                            <tr class="table-row" @onclick="() => ViewIncident(incident.Id)">
+                                <td class="incident-id">IN@incident.Id</td>
+                                <td>@incident.Description</td>
+                                <td>
+                                    <span class="severity-badge severity-@incident.Severity.ToString().ToLower()">
+                                        @incident.Severity
+                                    </span>
+                                </td>
+                                <td>@incident.Status</td>
+                                <td>@incident.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Recent Alerts -->
+    <div class="content-card">
+        <div class="card-header">
+            <h2>Recent Alerts</h2>
+            <a href="/alerts" class="link-view-all">View All →</a>
+        </div>
+        <div class="alerts-grid">
+            @if (recentAlerts == null || !recentAlerts.Any())
+            {
+                <div class="no-data">No alerts</div>
+            }
+            else
+            {
+                @foreach (var alert in recentAlerts.Take(6))
+                {
+                    <div class="alert-card">
+                        <div class="alert-header">
+                            <span class="alert-id">@alert.AlertId</span>
+                            <span class="severity-badge severity-@alert.Severity.ToLower()">
+                                @alert.Severity
+                            </span>
+                        </div>
+                        <div class="alert-body">
+                            <p class="alert-description">@alert.Description</p>
+                            <div class="alert-meta">
+                                <span>🖥️ @alert.Host</span>
+                                <span>🕐 @alert.Timestamp.ToString("HH:mm")</span>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --color-primary: #113B40;
+        --color-success: #038C3E;
+        --color-success-light: #41BF78;
+        --color-accent: #65BF8C;
+        --color-bg: #F2F2F2;
+        --color-white: #FFFFFF;
+        --color-text: #2C3E50;
+        --color-text-light: #7F8C8D;
+        --severity-critical: #E3342F;
+        --severity-high: #3B82F6;
+        --severity-medium: #FACC15;
+        --severity-low: #9CA3AF;
+    }
+
+    .dashboard-wrapper {
+        padding: 2rem;
+        max-width: 1400px;
+        margin: 0 auto;
+        background: var(--color-bg);
+        min-height: 100vh;
+    }
+
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .dashboard-header h1 {
+        color: var(--color-primary);
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .last-update {
+        color: var(--color-text-light);
+        font-size: 0.875rem;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .stat-card {
+        background: var(--color-white);
+        padding: 1.5rem;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.3s ease;
+    }
+
+    .stat-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .stat-card.primary { border-left: 4px solid var(--color-primary); }
+    .stat-card.success { border-left: 4px solid var(--color-success); }
+    .stat-card.danger { border-left: 4px solid var(--severity-critical); }
+    .stat-card.info { border-left: 4px solid var(--severity-high); }
+
+    .stat-icon {
+        font-size: 2.5rem;
+    }
+
+    .stat-number {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--color-primary);
+    }
+
+    .stat-label {
+        color: var(--color-text-light);
+        font-size: 0.875rem;
+    }
+
+    .content-card {
+        background: var(--color-white);
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid var(--color-bg);
+    }
+
+    .card-header h2 {
+        color: var(--color-primary);
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .link-view-all {
+        color: var(--color-success);
+        text-decoration: none;
+        font-weight: 600;
+        transition: color 0.3s ease;
+    }
+
+    .link-view-all:hover {
+        color: var(--color-success-light);
+    }
+
+    /* Severity Chart */
+    .severity-chart {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .chart-bar {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .bar-label {
+        min-width: 80px;
+        font-weight: 600;
+        color: var(--color-text);
+    }
+
+    .bar-wrapper {
+        flex: 1;
+        background: var(--color-bg);
+        border-radius: 8px;
+        height: 40px;
+        position: relative;
+    }
+
+    .bar {
+        height: 100%;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        padding: 0 1rem;
+        transition: width 0.5s ease;
+        min-width: 50px;
+    }
+
+    .bar-text {
+        color: white;
+        font-weight: 700;
+    }
+
+    .bar-critical { background: linear-gradient(135deg, var(--severity-critical) 0%, #DC2626 100%); }
+    .bar-high { background: linear-gradient(135deg, var(--severity-high) 0%, #2563EB 100%); }
+    .bar-medium { background: linear-gradient(135deg, var(--severity-medium) 0%, #F59E0B 100%); }
+    .bar-low { background: linear-gradient(135deg, var(--severity-low) 0%, #6B7280 100%); }
+
+    /* Quick Actions */
+    .quick-actions {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .action-btn {
+        padding: 1rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        font-size: 1rem;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+    }
+
+    .action-btn.primary {
+        background: var(--color-primary);
+        color: white;
+    }
+
+    .action-btn.success {
+        background: var(--color-success);
+        color: white;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .btn-icon {
+        font-size: 1.25rem;
+    }
+
+    /* Table */
+    .table-container {
+        overflow-x: auto;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .data-table th {
+        text-align: left;
+        padding: 1rem;
+        background: var(--color-bg);
+        font-weight: 600;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        color: var(--color-text);
+    }
+
+    .data-table td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--color-bg);
+    }
+
+    .table-row {
+        cursor: pointer;
+        transition: background 0.3s ease;
+    }
+
+    .table-row:hover {
+        background: var(--color-bg);
+    }
+
+    .incident-id {
+        font-weight: 700;
+        color: var(--color-primary);
+    }
+
+    .severity-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .severity-critical {
+        background: #FEE2E2;
+        color: var(--severity-critical);
+    }
+
+    .severity-high {
+        background: #DBEAFE;
+        color: var(--severity-high);
+    }
+
+    .severity-medium {
+        background: #FEF3C7;
+        color: #92400E;
+    }
+
+    .severity-low {
+        background: #F3F4F6;
+        color: var(--severity-low);
+    }
+
+    /* Alerts Grid */
+    .alerts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 1rem;
+    }
+
+    .alert-card {
+        background: var(--color-white);
+        border: 1px solid var(--color-bg);
+        border-radius: 8px;
+        padding: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .alert-card:hover {
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        transform: translateY(-2px);
+    }
+
+    .alert-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+    }
+
+    .alert-id {
+        font-weight: 600;
+        color: var(--color-primary);
+        font-size: 0.875rem;
+    }
+
+    .alert-description {
+        color: var(--color-text);
+        margin-bottom: 0.75rem;
+        font-size: 0.9375rem;
+    }
+
+    .alert-meta {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.8125rem;
+        color: var(--color-text-light);
+    }
+
+    .loading, .no-data {
+        text-align: center;
+        padding: 3rem;
+        color: var(--color-text-light);
+    }
+</style>
+
+@code {
+    private List<IncidentDto>? recentIncidents;
+    private List<AlertDto>? recentAlerts;
+    
+    private int openIncidents = 0;
+    private int newAlerts = 0;
+    private int criticalCount = 0;
+    private int highCount = 0;
+    private int mediumCount = 0;
+    private int lowCount = 0;
+    private int resolvedToday = 0;
+    private int totalIncidents = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        try
+        {
+            recentIncidents = await Http.GetFromJsonAsync<List<IncidentDto>>("api/incidents");
+            
+            // Placeholder alerts
+            recentAlerts = new List<AlertDto>
+            {
+                new() { AlertId = "ALT001", Description = "Suspicious login attempt detected", Host = "web-server-01", Severity = "Critical", Timestamp = DateTime.Now.AddHours(-2) },
+                new() { AlertId = "ALT002", Description = "High CPU usage detected", Host = "db-server-02", Severity = "High", Timestamp = DateTime.Now.AddHours(-1) },
+                new() { AlertId = "ALT003", Description = "Disk space running low", Host = "api-gateway", Severity = "Medium", Timestamp = DateTime.Now.AddMinutes(-30) },
+                new() { AlertId = "ALT004", Description = "Network latency increased", Host = "web-server-02", Severity = "Low", Timestamp = DateTime.Now.AddMinutes(-15) }
+            };
+            
+            if (recentIncidents != null)
+            {
+                totalIncidents = recentIncidents.Count;
+                openIncidents = recentIncidents.Count(i => i.Status != IncidentStatus.Resolved);
+                criticalCount = recentIncidents.Count(i => i.Severity == IncidentSeverity.Critical);
+                highCount = recentIncidents.Count(i => i.Severity == IncidentSeverity.High);
+                mediumCount = recentIncidents.Count(i => i.Severity == IncidentSeverity.Medium);
+                lowCount = recentIncidents.Count(i => i.Severity == IncidentSeverity.Low);
+                resolvedToday = recentIncidents.Count(i => i.ClosedAt?.Date == DateTime.Today);
+            }
+            
+            newAlerts = recentAlerts?.Count ?? 0;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading data: {ex.Message}");
+        }
+    }
+
+    private double GetPercentage(int count)
+    {
+        if (totalIncidents == 0) return 0;
+        return Math.Max(10, (count * 100.0 / totalIncidents));
+    }
+
+    private void ViewIncident(int id)
+    {
+        Navigation.NavigateTo($"/incidents/{id}");
+    }
+
+    private void ViewAllIncidents()
+    {
+        Navigation.NavigateTo("/incidents");
+    }
+
+    private void ViewAllAlerts()
+    {
+        Navigation.NavigateTo("/alerts");
+    }
+
+    public class IncidentDto
+    {
+        public int Id { get; set; }
+        public string Description { get; set; } = "";
+        public DateTime CreatedAt { get; set; }
+        public DateTime? ClosedAt { get; set; }
+        public IncidentStatus Status { get; set; }
+        public IncidentSeverity Severity { get; set; }
+    }
+
+    public class AlertDto
+    {
+        public string AlertId { get; set; } = "";
+        public string Description { get; set; } = "";
+        public string Host { get; set; } = "";
+        public string Severity { get; set; } = "Low";
+        public DateTime Timestamp { get; set; }
+    }
+
+    public enum IncidentStatus { New, Open, InProgress, Resolved, Escalated }
+    public enum IncidentSeverity { Low, Medium, High, Critical }
+}

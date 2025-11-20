@@ -7,6 +7,8 @@ namespace api.Services.Interfaces
     {
         Task<IEnumerable<IncidentDto>> GetAllAsync();
         Task<IncidentDto?> GetByIdAsync(int id);
+        Task<IncidentDto> CreateAsync(CreateIncidentDto dto);
+        Task<bool> UpdateAsync(int id, UpdateIncidentDto dto);
         Task<IncidentDto> CreateFromAlertAsync(CreateIncidentFromAlertDto dto);
         Task<bool> UpdateStatusAsync(int incidentId, string newStatus);
         Task<bool> AssignUserAsync(int incidentId, int userId);

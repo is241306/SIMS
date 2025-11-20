@@ -1,0 +1,453 @@
+@page "/incidents/{Id:int}"
+@page "/incidents/{Id:int}/edit"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Incident #@Id - SIMS</PageTitle>
+
+<div class="page-wrapper">
+    @if (loading)
+    {
+        <div class="loading">⏳ Loading incident...</div>
+    }
+    else if (incident == null)
+    {
+        <div class="error-card">
+            <h2>❌ Incident Not Found</h2>
+            <p>The incident with ID @Id could not be found.</p>
+            <button class="btn-primary" @onclick="GoBack">Go Back</button>
+        </div>
+    }
+    else
+    {
+        <div class="detail-header">
+            <div class="header-left">
+                <h1>Incident #@incident.Id</h1>
+                <div class="badges">
+                    <span class="severity-badge severity-@incident.Severity.ToString().ToLower()">
+                        @incident.Severity
+                    </span>
+                    <span class="status-badge status-@incident.Status.ToString().ToLower()">
+                        @incident.Status
+                    </span>
+                </div>
+            </div>
+            <div class="header-actions">
+                @if (!isEditing)
+                {
+                    <button class="btn-edit" @onclick="ToggleEdit">✏️ Edit</button>
+                }
+                else
+                {
+                    <button class="btn-save" @onclick="SaveIncident">💾 Save</button>
+                    <button class="btn-cancel" @onclick="CancelEdit">❌ Cancel</button>
+                }
+                <button class="btn-back" @onclick="GoBack">← Back</button>
+            </div>
+        </div>
+
+        <div class="detail-content">
+            <!-- Info Card -->
+            <div class="content-card">
+                <h2>📋 Details</h2>
+                
+                @if (isEditing)
+                {
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Description</label>
+                            <textarea @bind="incident.Description" rows="4" class="form-input"></textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Severity</label>
+                            <select @bind="incident.Severity" class="form-input">
+                                <option value="@IncidentSeverity.Low">Low</option>
+                                <option value="@IncidentSeverity.Medium">Medium</option>
+                                <option value="@IncidentSeverity.High">High</option>
+                                <option value="@IncidentSeverity.Critical">Critical</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Status</label>
+                            <select @bind="incident.Status" class="form-input">
+                                <option value="@IncidentStatus.New">New</option>
+                                <option value="@IncidentStatus.Open">Open</option>
+                                <option value="@IncidentStatus.InProgress">Investigating</option>
+                                <option value="@IncidentStatus.Resolved">Resolved</option>
+                                <option value="@IncidentStatus.Escalated">Escalated</option>
+                            </select>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Description:</span>
+                            <span class="info-value">@incident.Description</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Created:</span>
+                            <span class="info-value">@incident.CreatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Updated:</span>
+                            <span class="info-value">@incident.UpdatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+                        </div>
+                        @if (incident.ClosedAt.HasValue)
+                        {
+                            <div class="info-item">
+                                <span class="info-label">Closed:</span>
+                                <span class="info-value">@incident.ClosedAt.Value.ToString("dd.MM.yyyy HH:mm")</span>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+
+            <!-- Timeline -->
+            <div class="content-card">
+                <h2>📅 Timeline</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-marker created"></div>
+                        <div class="timeline-content">
+                            <div class="timeline-title">Incident Created</div>
+                            <div class="timeline-time">@incident.CreatedAt.ToString("dd.MM.yyyy HH:mm")</div>
+                        </div>
+                    </div>
+                    
+                    @if (incident.Status == IncidentStatus.InProgress)
+                    {
+                        <div class="timeline-item">
+                            <div class="timeline-marker progress"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Investigation Started</div>
+                                <div class="timeline-time">@incident.UpdatedAt.ToString("dd.MM.yyyy HH:mm")</div>
+                            </div>
+                        </div>
+                    }
+                    
+                    @if (incident.Status == IncidentStatus.Resolved && incident.ClosedAt.HasValue)
+                    {
+                        <div class="timeline-item">
+                            <div class="timeline-marker resolved"></div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Incident Resolved</div>
+                                <div class="timeline-time">@incident.ClosedAt.Value.ToString("dd.MM.yyyy HH:mm")</div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<style>
+    :root {
+        --color-primary: #113B40;
+        --color-success: #038C3E;
+        --color-bg: #F2F2F2;
+        --severity-critical: #E3342F;
+        --severity-high: #3B82F6;
+        --severity-medium: #FACC15;
+        --severity-low: #9CA3AF;
+    }
+
+    .page-wrapper {
+        padding: 2rem;
+        max-width: 1200px;
+        margin: 0 auto;
+        background: var(--color-bg);
+        min-height: 100vh;
+    }
+
+    .detail-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 2rem;
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .header-left h1 {
+        color: var(--color-primary);
+        margin-bottom: 0.75rem;
+    }
+
+    .badges {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .severity-badge, .status-badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .severity-critical { background: #FEE2E2; color: var(--severity-critical); }
+    .severity-high { background: #DBEAFE; color: var(--severity-high); }
+    .severity-medium { background: #FEF3C7; color: #92400E; }
+    .severity-low { background: #F3F4F6; color: var(--severity-low); }
+
+    .status-new { background: #F3F4F6; color: #6B7280; }
+    .status-open { background: #DBEAFE; color: #3B82F6; }
+    .status-inprogress { background: #FEF3C7; color: #F59E0B; }
+    .status-resolved { background: #D1FAE5; color: var(--color-success); }
+    .status-escalated { background: #FEE2E2; color: #E3342F; }
+
+    .header-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .btn-edit, .btn-save, .btn-cancel, .btn-back, .btn-primary {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-edit { background: var(--color-primary); color: white; }
+    .btn-save { background: var(--color-success); color: white; }
+    .btn-cancel { background: #6B7280; color: white; }
+    .btn-back { background: #E5E7EB; color: #374151; }
+    .btn-primary { background: var(--color-primary); color: white; }
+
+    .btn-edit:hover, .btn-save:hover, .btn-cancel:hover, .btn-back:hover, .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    .detail-content {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .content-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .content-card h2 {
+        color: var(--color-primary);
+        margin-bottom: 1.5rem;
+        font-size: 1.25rem;
+    }
+
+    .info-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .info-item {
+        display: grid;
+        grid-template-columns: 150px 1fr;
+        gap: 1rem;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #E5E7EB;
+    }
+
+    .info-item:last-child {
+        border-bottom: none;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: var(--color-primary);
+    }
+
+    .info-value {
+        color: #374151;
+    }
+
+    .form-grid {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: var(--color-primary);
+    }
+
+    .form-input {
+        padding: 0.75rem;
+        border: 1px solid #E5E7EB;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+    }
+
+    /* Timeline */
+    .timeline {
+        position: relative;
+        padding-left: 2rem;
+    }
+
+    .timeline::before {
+        content: '';
+        position: absolute;
+        left: 0.5rem;
+        top: 0;
+        bottom: 0;
+        width: 2px;
+        background: #E5E7EB;
+    }
+
+    .timeline-item {
+        position: relative;
+        padding-bottom: 2rem;
+        display: flex;
+        gap: 1rem;
+    }
+
+    .timeline-marker {
+        position: absolute;
+        left: -1.5rem;
+        width: 1rem;
+        height: 1rem;
+        border-radius: 50%;
+        border: 2px solid white;
+        box-shadow: 0 0 0 2px;
+    }
+
+    .timeline-marker.created {
+        background: #3B82F6;
+        box-shadow: 0 0 0 2px #3B82F6;
+    }
+
+    .timeline-marker.progress {
+        background: #F59E0B;
+        box-shadow: 0 0 0 2px #F59E0B;
+    }
+
+    .timeline-marker.resolved {
+        background: var(--color-success);
+        box-shadow: 0 0 0 2px var(--color-success);
+    }
+
+    .timeline-title {
+        font-weight: 600;
+        color: var(--color-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .timeline-time {
+        color: #6B7280;
+        font-size: 0.875rem;
+    }
+
+    .loading, .error-card {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .error-card h2 {
+        color: #E3342F;
+        margin-bottom: 1rem;
+    }
+</style>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private IncidentDto? incident;
+    private bool loading = true;
+    private bool isEditing = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadIncident();
+    }
+
+    private async Task LoadIncident()
+    {
+        loading = true;
+        try
+        {
+            incident = await Http.GetFromJsonAsync<IncidentDto>($"api/incidents/{Id}");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading incident: {ex.Message}");
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private void ToggleEdit()
+    {
+        isEditing = true;
+    }
+
+    private void CancelEdit()
+    {
+        isEditing = false;
+        LoadIncident(); // Reload to discard changes
+    }
+
+    private async Task SaveIncident()
+    {
+        try
+        {
+            await Http.PutAsJsonAsync($"api/incidents/{Id}", incident);
+            isEditing = false;
+            await LoadIncident();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error saving incident: {ex.Message}");
+        }
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/incidents");
+    }
+
+    public class IncidentDto
+    {
+        public int Id { get; set; }
+        public string Description { get; set; } = "";
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public DateTime? ClosedAt { get; set; }
+        public IncidentStatus Status { get; set; }
+        public IncidentSeverity Severity { get; set; }
+    }
+
+    public enum IncidentStatus { New, Open, InProgress, Resolved, Escalated }
+    public enum IncidentSeverity { Low, Medium, High, Critical }
+}

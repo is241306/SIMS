@@ -33,6 +33,23 @@ namespace api.Controllers
             return Ok(incident);
         }
 
+        // POST api/incidents
+        [HttpPost]
+        public async Task<ActionResult<IncidentDto>> Create(CreateIncidentDto dto)
+        {
+            var incident = await _incidentService.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = incident.Id }, incident);
+        }
+
+        // PUT api/incidents/{id}
+        [HttpPut("{id:int}")]
+        public async Task<IActionResult> Update(int id, UpdateIncidentDto dto)
+        {
+            var success = await _incidentService.UpdateAsync(id, dto);
+            if (!success) return NotFound();
+            return NoContent();
+        }
+
         // POST api/incidents/from-alert
         [HttpPost("from-alert")]
         public async Task<ActionResult<IncidentDto>> CreateFromAlert(CreateIncidentFromAlertDto dto)

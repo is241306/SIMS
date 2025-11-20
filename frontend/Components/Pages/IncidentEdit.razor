@@ -1,0 +1,408 @@
+@page "/incidents/{Id:int}/edit"
+@inject HttpClient Http
+@inject NavigationManager Navigation
+@rendermode InteractiveServer
+
+<PageTitle>Edit Incident #@Id - SIMS</PageTitle>
+
+<div class="page-wrapper">
+    @if (loading)
+    {
+        <div class="loading">⏳ Loading incident...</div>
+    }
+    else if (incident == null)
+    {
+        <div class="error-card">
+            <h2>❌ Incident Not Found</h2>
+            <button class="btn-primary" @onclick="GoBack">Go Back</button>
+        </div>
+    }
+    else
+    {
+        <div class="page-header">
+            <h1>✏️ Edit Incident #@Id</h1>
+            <button class="btn-back" @onclick="GoBack">← Back</button>
+        </div>
+
+        @if (!string.IsNullOrEmpty(errorMessage))
+        {
+            <div class="alert alert-error">⚠️ @errorMessage</div>
+        }
+
+        @if (!string.IsNullOrEmpty(successMessage))
+        {
+            <div class="alert alert-success">✅ @successMessage</div>
+        }
+
+        <div class="content-card">
+            <form @onsubmit="SaveIncident">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="description">Description *</label>
+                        <textarea id="description" 
+                                  @bind="incident.Description" 
+                                  rows="4" 
+                                  class="form-input"
+                                  required></textarea>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="severity">Severity *</label>
+                            <select id="severity" @bind="incident.Severity" class="form-input" required>
+                                <option value="Low">Low</option>
+                                <option value="Medium">Medium</option>
+                                <option value="High">High</option>
+                                <option value="Critical">Critical</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="status">Status *</label>
+                            <select id="status" @bind="incident.Status" class="form-input" required>
+                                <option value="New">New</option>
+                                <option value="Open">Open</option>
+                                <option value="InProgress">Investigating</option>
+                                <option value="Resolved">Resolved</option>
+                                <option value="Escalated">Escalated</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="assignedUser">Assign To</label>
+                        <select id="assignedUser" @bind="incident.AssignedId" class="form-input">
+                            <option value="">Unassigned</option>
+                            @foreach (var user in users)
+                            {
+                                <option value="@user.Id">@user.Name</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="info-section">
+                        <div class="info-item">
+                            <span class="info-label">Created:</span>
+                            <span class="info-value">@incident.CreatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Last Updated:</span>
+                            <span class="info-value">@incident.UpdatedAt.ToString("dd.MM.yyyy HH:mm")</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit" class="btn-save" disabled="@isSaving">
+                        @if (isSaving)
+                        {
+                            <span>⏳ Saving...</span>
+                        }
+                        else
+                        {
+                            <span>💾 Save Changes</span>
+                        }
+                    </button>
+                    <button type="button" class="btn-cancel" @onclick="GoBack">Cancel</button>
+                    <button type="button" class="btn-view" @onclick="ViewDetails">👁️ View Details</button>
+                </div>
+            </form>
+        </div>
+    }
+</div>
+
+<style>
+    :root {
+        --color-primary: #113B40;
+        --color-success: #038C3E;
+        --color-bg: #F2F2F2;
+    }
+
+    .page-wrapper {
+        padding: 2rem;
+        max-width: 1000px;
+        margin: 0 auto;
+        background: var(--color-bg);
+        min-height: 100vh;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+        color: var(--color-primary);
+        font-size: 2rem;
+        font-weight: 700;
+    }
+
+    .btn-back, .btn-primary {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-back {
+        background: #E5E7EB;
+        color: #374151;
+    }
+
+    .btn-primary {
+        background: var(--color-primary);
+        color: white;
+    }
+
+    .alert {
+        padding: 1rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-error {
+        background: #FEE2E2;
+        color: #E3342F;
+        border: 1px solid #E3342F;
+    }
+
+    .alert-success {
+        background: #D1FAE5;
+        color: var(--color-success);
+        border: 1px solid var(--color-success);
+    }
+
+    .content-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .form-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .form-group label {
+        font-weight: 600;
+        color: var(--color-primary);
+        font-size: 0.875rem;
+    }
+
+    .form-input {
+        padding: 0.75rem;
+        border: 2px solid #E5E7EB;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(17, 59, 64, 0.1);
+    }
+
+    .info-section {
+        background: #F9FAFB;
+        padding: 1rem;
+        border-radius: 8px;
+        display: flex;
+        gap: 2rem;
+    }
+
+    .info-item {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .info-label {
+        font-weight: 600;
+        color: var(--color-primary);
+    }
+
+    .info-value {
+        color: #6B7280;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 2px solid var(--color-bg);
+    }
+
+    .btn-save, .btn-cancel, .btn-view {
+        padding: 1rem 2rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .btn-save {
+        background: var(--color-success);
+        color: white;
+        flex: 1;
+    }
+
+    .btn-save:hover:not(:disabled) {
+        background: #41BF78;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(3, 140, 62, 0.3);
+    }
+
+    .btn-save:disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+    }
+
+    .btn-cancel {
+        background: #6B7280;
+        color: white;
+    }
+
+    .btn-view {
+        background: var(--color-primary);
+        color: white;
+    }
+
+    .loading, .error-card {
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    @@media (max-width: 768px) {
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .info-section {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+
+    private EditIncidentDto? incident;
+    private List<UserDto> users = new();
+    private bool loading = true;
+    private bool isSaving = false;
+    private string? errorMessage;
+    private string? successMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadData();
+    }
+
+    private async Task LoadData()
+    {
+        loading = true;
+        try
+        {
+            incident = await Http.GetFromJsonAsync<EditIncidentDto>($"api/incidents/{Id}");
+            users = await Http.GetFromJsonAsync<List<UserDto>>("api/users") ?? new();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error loading incident: {ex.Message}";
+            // Fallback users
+            users = new List<UserDto>
+            {
+                new() { Id = 1, Name = "John Doe" },
+                new() { Id = 2, Name = "Jane Smith" }
+            };
+        }
+        finally
+        {
+            loading = false;
+        }
+    }
+
+    private async Task SaveIncident()
+    {
+        if (incident == null) return;
+
+        isSaving = true;
+        errorMessage = null;
+        successMessage = null;
+
+        try
+        {
+            var response = await Http.PutAsJsonAsync($"api/incidents/{Id}", incident);
+            
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage = "Incident updated successfully!";
+                await Task.Delay(1000);
+                Navigation.NavigateTo($"/incidents/{Id}");
+            }
+            else
+            {
+                errorMessage = $"Failed to update incident: {response.StatusCode}";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = $"Error saving incident: {ex.Message}";
+        }
+        finally
+        {
+            isSaving = false;
+        }
+    }
+
+    private void ViewDetails()
+    {
+        Navigation.NavigateTo($"/incidents/{Id}");
+    }
+
+    private void GoBack()
+    {
+        Navigation.NavigateTo("/incidents");
+    }
+
+    public class EditIncidentDto
+    {
+        public string Description { get; set; } = "";
+        public string Severity { get; set; } = "";
+        public string Status { get; set; } = "";
+        public int? AssignedId { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+    }
+
+    public class UserDto
+    {
+        public int Id { get; set; }
+        public string Name { get; set; } = "";
+    }
+}

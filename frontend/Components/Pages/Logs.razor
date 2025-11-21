@@ -6,8 +6,10 @@
 
 <div class="page-wrapper">
     <div class="page-header">
-        <h1>📝 System Logs</h1>
-        <button class="btn-refresh" @onclick="LoadLogs">🔄 Refresh</button>
+        <h1><i class="bi bi-journal-text"></i> System Logs</h1>
+        <button class="btn-refresh" @onclick="LoadLogs">
+            <i class="bi bi-arrow-repeat"></i> Refresh
+        </button>
     </div>
 
     <!-- Filters -->
@@ -37,38 +39,38 @@
     <div class="content-card">
         <table class="data-table">
             <thead>
-                <tr>
-                    <th>Timestamp</th>
-                    <th>Level</th>
-                    <th>Message</th>
-                    <th>Source</th>
-                </tr>
+            <tr>
+                <th>Timestamp</th>
+                <th>Level</th>
+                <th>Message</th>
+                <th>Source</th>
+            </tr>
             </thead>
             <tbody>
-                @if (filteredLogs == null)
-                {
-                    <tr><td colspan="4" class="loading">Loading logs...</td></tr>
-                }
-                else if (!filteredLogs.Any())
-                {
-                    <tr><td colspan="4" class="no-data">No logs found</td></tr>
-                }
-                else
-                {
-                    @foreach (var log in filteredLogs)
-                    {
-                        <tr class="table-row">
-                            <td class="log-time">@log.Timestamp.ToString("dd.MM.yyyy HH:mm:ss")</td>
-                            <td>
+            @if (filteredLogs == null){
+                <tr>
+                    <td colspan="4" class="loading">Loading logs...</td>
+                </tr>
+            }
+            else if (!filteredLogs.Any()){
+                <tr>
+                    <td colspan="4" class="no-data">No logs found</td>
+                </tr>
+            }
+            else{
+                @foreach (var log in filteredLogs){
+                    <tr class="table-row">
+                        <td class="log-time">@log.Timestamp.ToString("dd.MM.yyyy HH:mm:ss")</td>
+                        <td>
                                 <span class="log-level level-@log.Level.ToLower()">
                                     @log.Level
                                 </span>
-                            </td>
-                            <td class="log-message">@log.Message</td>
-                            <td class="log-source">@log.Source</td>
-                        </tr>
-                    }
+                        </td>
+                        <td class="log-message">@log.Message</td>
+                        <td class="log-source">@log.Source</td>
+                    </tr>
                 }
+            }
             </tbody>
         </table>
     </div>
@@ -128,7 +130,7 @@
         display: flex;
         gap: 1rem;
         align-items: end;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .filter-group {
@@ -166,7 +168,7 @@
         border-radius: 12px;
         padding: 1.5rem;
         overflow-x: auto;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .data-table {
@@ -243,94 +245,89 @@
 @code {
     private List<LogDto>? logs;
     private List<LogDto>? filteredLogs;
-    
+
     private string _filterLevel = "";
-    private string filterLevel 
-    { 
-        get => _filterLevel; 
-        set { _filterLevel = value; ApplyFilters(); } 
-    }
-    
-    private string _filterTimeRange = "24";
-    private string filterTimeRange 
-    { 
-        get => _filterTimeRange; 
-        set { _filterTimeRange = value; ApplyFilters(); } 
+
+    private string filterLevel {
+        get => _filterLevel;
+        set {
+            _filterLevel = value;
+            ApplyFilters();
+        }
     }
 
-    protected override async Task OnInitializedAsync()
-    {
+    private string _filterTimeRange = "24";
+
+    private string filterTimeRange {
+        get => _filterTimeRange;
+        set {
+            _filterTimeRange = value;
+            ApplyFilters();
+        }
+    }
+
+    protected override async Task OnInitializedAsync() {
         await LoadLogs();
     }
 
-    private async Task LoadLogs()
-    {
-        try
-        {
+    private async Task LoadLogs() {
+        try{
             var redisLogs = await Http.GetFromJsonAsync<List<Dictionary<string, object>>>("api/logs/latest?count=100");
-            
-            if (redisLogs != null)
-            {
-                logs = redisLogs.Select(log => new LogDto
-                {
-                    Timestamp = log.ContainsKey("Timestamp") && log["Timestamp"] != null 
-                        ? DateTime.Parse(log["Timestamp"].ToString()!) 
+
+            if (redisLogs != null){
+                logs = redisLogs.Select(log => new LogDto {
+                    Timestamp = log.ContainsKey("Timestamp") && log["Timestamp"] != null
+                        ? DateTime.Parse(log["Timestamp"].ToString()!)
                         : DateTime.Now,
-                    Level = log.ContainsKey("Level") && log["Level"] != null 
-                        ? log["Level"].ToString()! 
+                    Level = log.ContainsKey("Level") && log["Level"] != null
+                        ? log["Level"].ToString()!
                         : "Info",
-                    Message = log.ContainsKey("Message") && log["Message"] != null 
-                        ? log["Message"].ToString()! 
+                    Message = log.ContainsKey("Message") && log["Message"] != null
+                        ? log["Message"].ToString()!
                         : "No message",
-                    Source = log.ContainsKey("Source") && log["Source"] != null 
-                        ? log["Source"].ToString()! 
+                    Source = log.ContainsKey("Source") && log["Source"] != null
+                        ? log["Source"].ToString()!
                         : "Unknown"
                 }).ToList();
             }
-            else
-            {
-                logs = new List<LogDto>
-                {
+            else{
+                logs = new List<LogDto> {
                     new() { Timestamp = DateTime.Now, Level = "Info", Message = "No logs available in Redis", Source = "System" }
                 };
             }
-            
+
             ApplyFilters();
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex){
             Console.WriteLine($"Error loading logs from Redis: {ex.Message}");
-            logs = new List<LogDto>
-            {
+            logs = new List<LogDto> {
                 new() { Timestamp = DateTime.Now, Level = "Error", Message = $"Failed to load logs: {ex.Message}", Source = "LogsPage" }
             };
             ApplyFilters();
         }
     }
 
-    private void ApplyFilters()
-    {
+    private void ApplyFilters() {
         var timeRangeHours = int.Parse(filterTimeRange);
         var cutoffTime = DateTime.Now.AddHours(-timeRangeHours);
-        
+
         filteredLogs = logs?.Where(l =>
             (string.IsNullOrEmpty(filterLevel) || l.Level == filterLevel) &&
             l.Timestamp >= cutoffTime
         ).OrderByDescending(l => l.Timestamp).ToList();
     }
 
-    private void ResetFilters()
-    {
+    private void ResetFilters() {
         filterLevel = "";
         filterTimeRange = "24";
         ApplyFilters();
     }
 
-    public class LogDto
-    {
+    public class LogDto {
         public DateTime Timestamp { get; set; }
         public string Level { get; set; } = "Info";
         public string Message { get; set; } = "";
         public string Source { get; set; } = "";
     }
+
 }

@@ -1,35 +1,37 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">frontend</a>
+﻿<div class="sidebar">
+    <div class="sidebar-header">
+        <img src="img/Logo-transparent.png" class="sidebar-logo" />
     </div>
-</div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
+    <nav class="sidebar-nav">
+        <NavLink class="sidebar-link" href="dashboard">
+            <i class="bi bi-speedometer2"></i>
+            <span>Dashboard</span>
+        </NavLink>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
+        <NavLink class="sidebar-link" href="incidents">
+            <i class="bi bi-exclamation-triangle"></i>
+            <span>Incidents</span>
+        </NavLink>
+        
+        <NavLink class="sidebar-link" href="alerts">
+            <i class="bi bi-bell"></i>
+            <span>Alerts</span>
+        </NavLink>
+        
+        <NavLink class="sidebar-link" href="users">
+            <i class="bi bi-people"></i>
+            <span>Users</span>
+        </NavLink>
+        
+        <NavLink class="sidebar-link" href="logs">
+            <i class="bi bi-journal-text"></i>
+            <span>Logs</span>
+        </NavLink>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="dashboard">
-                <span class="bi bi-speedometer2" aria-hidden="true"></span> Dashboard
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="weather">
-                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Weather
-            </NavLink>
-        </div>
+        <NavLink class="sidebar-link" href="login">
+            <i class="bi bi-box-arrow-right"></i>
+            <span>Logout</span>
+        </NavLink>
     </nav>
 </div>

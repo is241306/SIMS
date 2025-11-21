@@ -7,14 +7,13 @@
 
 <div class="page-wrapper">
     <div class="page-header">
-        <h1>➕ Create New Incident</h1>
-        <button class="btn-back" @onclick="GoBack">← Back</button>
+        <h1><i class="bi bi-plus-circle"></i> Create New Incident</h1>
+        <button class="btn-back" @onclick="GoBack"><i class="bi bi-arrow-left"></i> Back</button>
     </div>
 
-    @if (!string.IsNullOrEmpty(errorMessage))
-    {
+    @if (!string.IsNullOrEmpty(errorMessage)){
         <div class="alert alert-error">
-            ⚠️ @errorMessage
+            <i class="bi bi-exclamation-triangle-fill"></i> @errorMessage
         </div>
     }
 
@@ -23,9 +22,9 @@
             <div class="form-grid">
                 <div class="form-group">
                     <label for="description">Description *</label>
-                    <textarea id="description" 
-                              @bind="incident.Description" 
-                              rows="4" 
+                    <textarea id="description"
+                              @bind="incident.Description"
+                              rows="4"
                               class="form-input"
                               placeholder="Describe the incident..."
                               required></textarea>
@@ -58,8 +57,7 @@
                     <label for="assignedUser">Assign To</label>
                     <select id="assignedUser" @bind="incident.AssignedId" class="form-input">
                         <option value="0">Unassigned</option>
-                        @foreach (var user in users)
-                        {
+                        @foreach (var user in users){
                             <option value="@user.Id">@user.Name</option>
                         }
                     </select>
@@ -67,23 +65,21 @@
 
                 <div class="form-group">
                     <label for="alertId">Related Alert (Optional)</label>
-                    <input id="alertId" 
-                           type="text" 
-                           @bind="incident.AlertId" 
+                    <input id="alertId"
+                           type="text"
+                           @bind="incident.AlertId"
                            class="form-input"
-                           placeholder="e.g., ALT001" />
+                           placeholder="e.g., ALT001"/>
                 </div>
             </div>
 
             <div class="form-actions">
                 <button type="submit" class="btn-create" disabled="@isSubmitting">
-                    @if (isSubmitting)
-                    {
-                        <span>⏳ Creating...</span>
+                    @if (isSubmitting){
+                        <span><i class="bi bi-hourglass-split"></i> Creating...</span>
                     }
-                    else
-                    {
-                        <span>✅ Create Incident</span>
+                    else{
+                        <span><i class="bi bi-check2-circle"></i> Create Incident</span>
                     }
                 </button>
                 <button type="button" class="btn-cancel" @onclick="GoBack">Cancel</button>
@@ -92,10 +88,9 @@
     </div>
 
     <!-- Preview Card -->
-    @if (!string.IsNullOrEmpty(incident.Description))
-    {
+    @if (!string.IsNullOrEmpty(incident.Description)){
         <div class="content-card preview-card">
-            <h2>📋 Preview</h2>
+            <h2><i class="bi bi-clipboard-data"></i> Preview</h2>
             <div class="preview-content">
                 <div class="preview-item">
                     <span class="preview-label">Description:</span>
@@ -103,20 +98,17 @@
                 </div>
                 <div class="preview-item">
                     <span class="preview-label">Severity:</span>
-                    @if (!string.IsNullOrEmpty(incident.Severity))
-                    {
+                    @if (!string.IsNullOrEmpty(incident.Severity)){
                         <span class="severity-badge severity-@incident.Severity.ToLower()">@incident.Severity</span>
                     }
                 </div>
                 <div class="preview-item">
                     <span class="preview-label">Status:</span>
-                    @if (!string.IsNullOrEmpty(incident.Status))
-                    {
+                    @if (!string.IsNullOrEmpty(incident.Status)){
                         <span class="status-badge">@incident.Status</span>
                     }
                 </div>
-                @if (incident.AssignedId > 0)
-                {
+                @if (incident.AssignedId > 0){
                     <div class="preview-item">
                         <span class="preview-label">Assigned To:</span>
                         <span class="preview-value">@users.FirstOrDefault(u => u.Id == incident.AssignedId)?.Name</span>
@@ -191,7 +183,7 @@
         background: white;
         padding: 2rem;
         border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         margin-bottom: 1.5rem;
     }
 
@@ -322,10 +314,25 @@
         text-transform: uppercase;
     }
 
-    .severity-critical { background: #FEE2E2; color: var(--severity-critical); }
-    .severity-high { background: #DBEAFE; color: var(--severity-high); }
-    .severity-medium { background: #FEF3C7; color: #92400E; }
-    .severity-low { background: #F3F4F6; color: var(--severity-low); }
+    .severity-critical {
+        background: #FEE2E2;
+        color: var(--severity-critical);
+    }
+
+    .severity-high {
+        background: #DBEAFE;
+        color: var(--severity-high);
+    }
+
+    .severity-medium {
+        background: #FEF3C7;
+        color: #92400E;
+    }
+
+    .severity-low {
+        background: #F3F4F6;
+        color: var(--severity-low);
+    }
 
     .status-badge {
         padding: 0.375rem 0.75rem;
@@ -349,24 +356,19 @@
     private string? errorMessage;
     private bool isSubmitting = false;
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() {
         await LoadUsers();
-        
+
         incident.Status = "New";
         incident.Severity = "Medium";
     }
 
-    private async Task LoadUsers()
-    {
-        try
-        {
+    private async Task LoadUsers() {
+        try{
             users = await Http.GetFromJsonAsync<List<UserDto>>("api/users") ?? new();
         }
-        catch
-        {
-            users = new List<UserDto>
-            {
+        catch{
+            users = new List<UserDto> {
                 new() { Id = 1, Name = "John Doe" },
                 new() { Id = 2, Name = "Jane Smith" },
                 new() { Id = 3, Name = "Bob Johnson" }
@@ -374,16 +376,13 @@
         }
     }
 
-    private async Task CreateIncident()
-    {
-        if (string.IsNullOrWhiteSpace(incident.Description))
-        {
+    private async Task CreateIncident() {
+        if (string.IsNullOrWhiteSpace(incident.Description)){
             errorMessage = "Description is required";
             return;
         }
 
-        if (string.IsNullOrEmpty(incident.Severity) || string.IsNullOrEmpty(incident.Status))
-        {
+        if (string.IsNullOrEmpty(incident.Severity) || string.IsNullOrEmpty(incident.Status)){
             errorMessage = "Severity and Status are required";
             return;
         }
@@ -391,44 +390,35 @@
         isSubmitting = true;
         errorMessage = null;
 
-        try
-        {
+        try{
             var response = await Http.PostAsJsonAsync("api/incidents", incident);
-            
-            if (response.IsSuccessStatusCode)
-            {
+
+            if (response.IsSuccessStatusCode){
                 var createdIncident = await response.Content.ReadFromJsonAsync<IncidentResponseDto>();
-                if (createdIncident != null)
-                {
+                if (createdIncident != null){
                     Navigation.NavigateTo($"/incidents/{createdIncident.Id}");
                 }
-                else
-                {
+                else{
                     Navigation.NavigateTo("/incidents");
                 }
             }
-            else
-            {
+            else{
                 errorMessage = $"Failed to create incident: {response.StatusCode}";
             }
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex){
             errorMessage = $"Error creating incident: {ex.Message}";
         }
-        finally
-        {
+        finally{
             isSubmitting = false;
         }
     }
 
-    private void GoBack()
-    {
+    private void GoBack() {
         Navigation.NavigateTo("/incidents");
     }
 
-    public class CreateIncidentDto
-    {
+    public class CreateIncidentDto {
         public string Description { get; set; } = "";
         public string Severity { get; set; } = "";
         public string Status { get; set; } = "";
@@ -436,14 +426,13 @@
         public string? AlertId { get; set; }
     }
 
-    public class UserDto
-    {
+    public class UserDto {
         public int Id { get; set; }
         public string Name { get; set; } = "";
     }
 
-    public class IncidentResponseDto
-    {
+    public class IncidentResponseDto {
         public int Id { get; set; }
     }
+
 }

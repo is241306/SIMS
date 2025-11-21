@@ -5,9 +5,9 @@
 
 <PageTitle>Dashboard - SIMS</PageTitle>
 
-<div class="dashboard-wrapper">
+<div class="dashboard-wrapper" style="border-radius: 10px">
     <div class="dashboard-header">
-        <h1>🛡️ SIMS Dashboard</h1>
+        <h1>Dashboard</h1>
         <div class="header-actions">
             <span class="last-update">Last updated: @DateTime.Now.ToString("HH:mm:ss")</span>
         </div>
@@ -16,28 +16,28 @@
     <!-- Stats Grid -->
     <div class="stats-grid">
         <div class="stat-card primary">
-            <div class="stat-icon">📋</div>
+            <div class="stat-icon"><i class="bi bi-clipboard-data"></i></div>
             <div class="stat-content">
                 <div class="stat-number">@openIncidents</div>
                 <div class="stat-label">Open Incidents</div>
             </div>
         </div>
         <div class="stat-card success">
-            <div class="stat-icon">🔔</div>
+            <div class="stat-icon"><i class="bi bi-bell-fill"></i></div>
             <div class="stat-content">
                 <div class="stat-number">@newAlerts</div>
                 <div class="stat-label">New Alerts</div>
             </div>
         </div>
         <div class="stat-card danger">
-            <div class="stat-icon">⚠️</div>
+            <div class="stat-icon"><i class="bi bi-exclamation-octagon-fill"></i></div>
             <div class="stat-content">
                 <div class="stat-number">@criticalCount</div>
                 <div class="stat-label">Critical Issues</div>
             </div>
         </div>
         <div class="stat-card info">
-            <div class="stat-icon">✅</div>
+            <div class="stat-icon"><i class="bi bi-check2-circle"></i></div>
             <div class="stat-content">
                 <div class="stat-number">@resolvedToday</div>
                 <div class="stat-label">Resolved Today</div>
@@ -89,11 +89,11 @@
     <!-- Quick Actions -->
     <div class="quick-actions">
         <button class="action-btn primary" @onclick="ViewAllIncidents">
-            <span class="btn-icon">📋</span>
+            <span class="btn-icon"><i class="bi bi-clipboard-data"></i></span>
             <span>View All Incidents</span>
         </button>
         <button class="action-btn success" @onclick="ViewAllAlerts">
-            <span class="btn-icon">🔔</span>
+            <span class="btn-icon"><i class="bi bi-bell-fill"></i></span>
             <span>View All Alerts</span>
         </button>
     </div>
@@ -107,40 +107,40 @@
         <div class="table-container">
             <table class="data-table">
                 <thead>
-                    <tr>
-                        <th>ID</th>
-                        <th>Description</th>
-                        <th>Severity</th>
-                        <th>Status</th>
-                        <th>Created</th>
-                    </tr>
+                <tr>
+                    <th>ID</th>
+                    <th>Description</th>
+                    <th>Severity</th>
+                    <th>Status</th>
+                    <th>Created</th>
+                </tr>
                 </thead>
                 <tbody>
-                    @if (recentIncidents == null)
-                    {
-                        <tr><td colspan="5" class="loading">Loading...</td></tr>
-                    }
-                    else if (!recentIncidents.Any())
-                    {
-                        <tr><td colspan="5" class="no-data">No incidents</td></tr>
-                    }
-                    else
-                    {
-                        @foreach (var incident in recentIncidents.Take(5))
-                        {
-                            <tr class="table-row" @onclick="() => ViewIncident(incident.Id)">
-                                <td class="incident-id">IN@incident.Id</td>
-                                <td>@incident.Description</td>
-                                <td>
+                @if (recentIncidents == null){
+                    <tr>
+                        <td colspan="5" class="loading">Loading...</td>
+                    </tr>
+                }
+                else if (!recentIncidents.Any()){
+                    <tr>
+                        <td colspan="5" class="no-data">No incidents</td>
+                    </tr>
+                }
+                else{
+                    @foreach (var incident in recentIncidents.Take(5)){
+                        <tr class="table-row" @onclick="() => ViewIncident(incident.Id)">
+                            <td class="incident-id">IN@incident.Id</td>
+                            <td>@incident.Description</td>
+                            <td>
                                     <span class="severity-badge severity-@incident.Severity.ToString().ToLower()">
                                         @incident.Severity
                                     </span>
-                                </td>
-                                <td>@incident.Status</td>
-                                <td>@incident.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
-                            </tr>
-                        }
+                            </td>
+                            <td>@incident.Status</td>
+                            <td>@incident.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        </tr>
                     }
+                }
                 </tbody>
             </table>
         </div>
@@ -153,14 +153,11 @@
             <a href="/alerts" class="link-view-all">View All →</a>
         </div>
         <div class="alerts-grid">
-            @if (recentAlerts == null || !recentAlerts.Any())
-            {
+            @if (recentAlerts == null || !recentAlerts.Any()){
                 <div class="no-data">No alerts</div>
             }
-            else
-            {
-                @foreach (var alert in recentAlerts.Take(6))
-                {
+            else{
+                @foreach (var alert in recentAlerts.Take(6)){
                     <div class="alert-card">
                         <div class="alert-header">
                             <span class="alert-id">@alert.AlertId</span>
@@ -171,8 +168,8 @@
                         <div class="alert-body">
                             <p class="alert-description">@alert.Description</p>
                             <div class="alert-meta">
-                                <span>🖥️ @alert.Host</span>
-                                <span>🕐 @alert.Timestamp.ToString("HH:mm")</span>
+                                <span><i class="bi bi-pc-display"></i> @alert.Host</span>
+                                <span><i class="bi bi-clock"></i> @alert.Timestamp.ToString("HH:mm")</span>
                             </div>
                         </div>
                     </div>
@@ -181,6 +178,7 @@
         </div>
     </div>
 </div>
+
 
 <style>
     :root {
@@ -238,19 +236,30 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease;
     }
 
     .stat-card:hover {
         transform: translateY(-4px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
-    .stat-card.primary { border-left: 4px solid var(--color-primary); }
-    .stat-card.success { border-left: 4px solid var(--color-success); }
-    .stat-card.danger { border-left: 4px solid var(--severity-critical); }
-    .stat-card.info { border-left: 4px solid var(--severity-high); }
+    .stat-card.primary {
+        border-left: 4px solid var(--color-primary);
+    }
+
+    .stat-card.success {
+        border-left: 4px solid var(--color-success);
+    }
+
+    .stat-card.danger {
+        border-left: 4px solid var(--severity-critical);
+    }
+
+    .stat-card.info {
+        border-left: 4px solid var(--severity-high);
+    }
 
     .stat-icon {
         font-size: 2.5rem;
@@ -272,7 +281,7 @@
         border-radius: 12px;
         padding: 1.5rem;
         margin-bottom: 2rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .card-header {
@@ -343,10 +352,21 @@
         font-weight: 700;
     }
 
-    .bar-critical { background: linear-gradient(135deg, var(--severity-critical) 0%, #DC2626 100%); }
-    .bar-high { background: linear-gradient(135deg, var(--severity-high) 0%, #2563EB 100%); }
-    .bar-medium { background: linear-gradient(135deg, var(--severity-medium) 0%, #F59E0B 100%); }
-    .bar-low { background: linear-gradient(135deg, var(--severity-low) 0%, #6B7280 100%); }
+    .bar-critical {
+        background: linear-gradient(135deg, var(--severity-critical) 0%, #DC2626 100%);
+    }
+
+    .bar-high {
+        background: linear-gradient(135deg, var(--severity-high) 0%, #2563EB 100%);
+    }
+
+    .bar-medium {
+        background: linear-gradient(135deg, var(--severity-medium) 0%, #F59E0B 100%);
+    }
+
+    .bar-low {
+        background: linear-gradient(135deg, var(--severity-low) 0%, #6B7280 100%);
+    }
 
     /* Quick Actions */
     .quick-actions {
@@ -382,7 +402,7 @@
 
     .action-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .btn-icon {
@@ -472,7 +492,7 @@
     }
 
     .alert-card:hover {
-        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
         transform: translateY(-2px);
     }
 
@@ -512,7 +532,7 @@
 @code {
     private List<IncidentDto>? recentIncidents;
     private List<AlertDto>? recentAlerts;
-    
+
     private int openIncidents = 0;
     private int newAlerts = 0;
     private int criticalCount = 0;
@@ -522,27 +542,22 @@
     private int resolvedToday = 0;
     private int totalIncidents = 0;
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() {
         await LoadData();
     }
 
-    private async Task LoadData()
-    {
-        try
-        {
+    private async Task LoadData() {
+        try{
             recentIncidents = await Http.GetFromJsonAsync<List<IncidentDto>>("api/incidents");
-            
-            recentAlerts = new List<AlertDto>
-            {
+
+            recentAlerts = new List<AlertDto> {
                 new() { AlertId = "ALT001", Description = "Suspicious login attempt detected", Host = "web-server-01", Severity = "Critical", Timestamp = DateTime.Now.AddHours(-2) },
                 new() { AlertId = "ALT002", Description = "High CPU usage detected", Host = "db-server-02", Severity = "High", Timestamp = DateTime.Now.AddHours(-1) },
                 new() { AlertId = "ALT003", Description = "Disk space running low", Host = "api-gateway", Severity = "Medium", Timestamp = DateTime.Now.AddMinutes(-30) },
                 new() { AlertId = "ALT004", Description = "Network latency increased", Host = "web-server-02", Severity = "Low", Timestamp = DateTime.Now.AddMinutes(-15) }
             };
-            
-            if (recentIncidents != null)
-            {
+
+            if (recentIncidents != null){
                 totalIncidents = recentIncidents.Count;
                 openIncidents = recentIncidents.Count(i => i.Status != IncidentStatus.Resolved);
                 criticalCount = recentIncidents.Count(i => i.Severity == IncidentSeverity.Critical);
@@ -551,38 +566,32 @@
                 lowCount = recentIncidents.Count(i => i.Severity == IncidentSeverity.Low);
                 resolvedToday = recentIncidents.Count(i => i.ClosedAt?.Date == DateTime.Today);
             }
-            
+
             newAlerts = recentAlerts?.Count ?? 0;
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex){
             Console.WriteLine($"Error loading data: {ex.Message}");
         }
     }
 
-    private double GetPercentage(int count)
-    {
+    private double GetPercentage(int count) {
         if (totalIncidents == 0) return 0;
         return Math.Max(10, (count * 100.0 / totalIncidents));
     }
 
-    private void ViewIncident(int id)
-    {
+    private void ViewIncident(int id) {
         Navigation.NavigateTo($"/incidents/{id}");
     }
 
-    private void ViewAllIncidents()
-    {
+    private void ViewAllIncidents() {
         Navigation.NavigateTo("/incidents");
     }
 
-    private void ViewAllAlerts()
-    {
+    private void ViewAllAlerts() {
         Navigation.NavigateTo("/alerts");
     }
 
-    public class IncidentDto
-    {
+    public class IncidentDto {
         public int Id { get; set; }
         public string Description { get; set; } = "";
         public DateTime CreatedAt { get; set; }
@@ -591,8 +600,7 @@
         public IncidentSeverity Severity { get; set; }
     }
 
-    public class AlertDto
-    {
+    public class AlertDto {
         public string AlertId { get; set; } = "";
         public string Description { get; set; } = "";
         public string Host { get; set; } = "";
@@ -600,6 +608,19 @@
         public DateTime Timestamp { get; set; }
     }
 
-    public enum IncidentStatus { New, Open, InProgress, Resolved, Escalated }
-    public enum IncidentSeverity { Low, Medium, High, Critical }
+    public enum IncidentStatus {
+        New,
+        Open,
+        InProgress,
+        Resolved,
+        Escalated
+    }
+
+    public enum IncidentSeverity {
+        Low,
+        Medium,
+        High,
+        Critical
+    }
+
 }

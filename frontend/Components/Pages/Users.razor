@@ -7,90 +7,89 @@
 
 <div class="page-wrapper">
     <div class="page-header">
-        <h1>👥 Users & Roles Management</h1>
-        <button class="btn-create" @onclick="CreateUser">+ New User</button>
+        <h1><i class="bi bi-people-fill"></i> Users & Roles Management</h1>
+        <button class="btn-create" @onclick="CreateUser"><i class="bi bi-person-plus-fill"></i> New User</button>
     </div>
 
     <!-- Users Table -->
     <div class="content-card">
         <table class="data-table">
             <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Username</th>
-                    <th>Email</th>
-                    <th>Role</th>
-                    <th>Status</th>
-                    <th>Created</th>
-                    <th>Actions</th>
-                </tr>
+            <tr>
+                <th>ID</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
             </thead>
             <tbody>
-                @if (users == null)
-                {
-                    <tr><td colspan="7" class="loading">Loading...</td></tr>
-                }
-                else if (!users.Any())
-                {
-                    <tr><td colspan="7" class="no-data">No users found</td></tr>
-                }
-                else
-                {
-                    @foreach (var user in users)
-                    {
-                        <tr class="table-row @(user.IsActive ? "" : "inactive")">
-                            <td class="user-id">@user.Id</td>
-                            <td>
-                                <div class="user-info">
-                                    <span class="user-avatar">@user.Username[0]</span>
-                                    <span>@user.Username</span>
-                                </div>
-                            </td>
-                            <td>@user.Email</td>
-                            <td>
-                                <select class="role-select" 
-                                        value="@user.Role" 
-                                        @onchange="@(async (e) => await ChangeRole(user.Id, e.Value?.ToString() ?? string.Empty))"
-                                        disabled="@(!user.IsActive)">
-                                    <option value="User">User</option>
-                                    <option value="Analyst">Analyst</option>
-                                    <option value="Admin">Admin</option>
-                                </select>
-                            </td>
-                            <td>
+            @if (users == null){
+                <tr>
+                    <td colspan="7" class="loading">Loading...</td>
+                </tr>
+            }
+            else if (!users.Any()){
+                <tr>
+                    <td colspan="7" class="no-data">No users found</td>
+                </tr>
+            }
+            else{
+                @foreach (var user in users){
+                    <tr class="table-row @(user.IsActive ? "" : "inactive")">
+                        <td class="user-id">@user.Id</td>
+                        <td>
+                            <div class="user-info">
+                                <span class="user-avatar">@user.Username[0]</span>
+                                <span>@user.Username</span>
+                            </div>
+                        </td>
+                        <td>@user.Email</td>
+                        <td>
+                            <select class="role-select"
+                                    value="@user.Role"
+                                    @onchange="@(async (e) => await ChangeRole(user.Id, e.Value?.ToString() ?? string.Empty))"
+                                    disabled="@(!user.IsActive)">
+                                <option value="User">User</option>
+                                <option value="Analyst">Analyst</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                        </td>
+                        <td>
                                 <span class="status-badge @(user.IsActive ? "active" : "inactive")">
                                     @(user.IsActive ? "Active" : "Inactive")
                                 </span>
-                            </td>
-                            <td>@user.CreatedAt.ToString("dd.MM.yyyy")</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-action btn-edit" 
-                                            @onclick="() => EditUser(user.Id)" 
-                                            title="Edit User">
-                                        ✏️
+                        </td>
+                        <td>@user.CreatedAt.ToString("dd.MM.yyyy")</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-edit"
+                                        @onclick="() => EditUser(user.Id)"
+                                        title="Edit User">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+
+                                @if (user.IsActive){
+                                    <button class="btn-action btn-deactivate"
+                                            @onclick="() => DeactivateUser(user.Id)"
+                                            title="Deactivate">
+                                        <i class="bi bi-person-dash-fill"></i>
                                     </button>
-                                    @if (user.IsActive)
-                                    {
-                                        <button class="btn-action btn-deactivate" 
-                                                @onclick="() => DeactivateUser(user.Id)" 
-                                                title="Deactivate">
-                                            🚫
-                                        </button>
-                                    }
-                                    else
-                                    {
-                                        <button class="btn-action btn-activate" 
-                                                @onclick="() => ActivateUser(user.Id)" 
-                                                title="Activate">
-                                            ✅
-                                        </button>
-                                    }
-                                </div>
-                            </td>
-                        </tr>
-                    }
+                                }
+                                else{
+                                    <button class="btn-action btn-activate"
+                                            @onclick="() => ActivateUser(user.Id)"
+                                            title="Activate">
+                                        <i class="bi bi-person-check-fill"></i>
+                                    </button>
+                                }
+                            </div>
+                        </td>
+                    </tr>
                 }
+            }
             </tbody>
         </table>
     </div>
@@ -98,28 +97,31 @@
     <!-- Role Statistics -->
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon">👤</div>
+            <div class="stat-icon"><i class="bi bi-person-fill"></i></div>
             <div class="stat-content">
                 <div class="stat-number">@users?.Count(u => u.Role == "User")</div>
                 <div class="stat-label">Users</div>
             </div>
         </div>
+
         <div class="stat-card">
-            <div class="stat-icon">🔍</div>
+            <div class="stat-icon"><i class="bi bi-search"></i></div>
             <div class="stat-content">
                 <div class="stat-number">@users?.Count(u => u.Role == "Analyst")</div>
                 <div class="stat-label">Analysts</div>
             </div>
         </div>
+
         <div class="stat-card">
-            <div class="stat-icon">⚙️</div>
+            <div class="stat-icon"><i class="bi bi-gear-fill"></i></div>
             <div class="stat-content">
                 <div class="stat-number">@users?.Count(u => u.Role == "Admin")</div>
                 <div class="stat-label">Admins</div>
             </div>
         </div>
+
         <div class="stat-card">
-            <div class="stat-icon">✅</div>
+            <div class="stat-icon"><i class="bi bi-check-circle-fill"></i></div>
             <div class="stat-content">
                 <div class="stat-number">@users?.Count(u => u.IsActive)</div>
                 <div class="stat-label">Active</div>
@@ -180,7 +182,7 @@
         padding: 1.5rem;
         margin-bottom: 2rem;
         overflow-x: auto;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .data-table {
@@ -305,7 +307,7 @@
         display: flex;
         align-items: center;
         gap: 1rem;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .stat-icon {
@@ -333,21 +335,16 @@
 @code {
     private List<UserDto>? users;
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() {
         await LoadUsers();
     }
 
-    private async Task LoadUsers()
-    {
-        try
-        {
+    private async Task LoadUsers() {
+        try{
             users = await Http.GetFromJsonAsync<List<UserDto>>("api/users");
         }
-        catch
-        {
-            users = new List<UserDto>
-            {
+        catch{
+            users = new List<UserDto> {
                 new() { Id = 1, Username = "admin", Email = "admin@sims.com", Role = "Admin", IsActive = true, CreatedAt = DateTime.Now.AddMonths(-6) },
                 new() { Id = 2, Username = "john.doe", Email = "john@sims.com", Role = "Analyst", IsActive = true, CreatedAt = DateTime.Now.AddMonths(-3) },
                 new() { Id = 3, Username = "jane.smith", Email = "jane@sims.com", Role = "User", IsActive = true, CreatedAt = DateTime.Now.AddMonths(-2) },
@@ -356,57 +353,45 @@
         }
     }
 
-    private async Task ChangeRole(int userId, string newRole)
-    {
-        try
-        {
+    private async Task ChangeRole(int userId, string newRole) {
+        try{
             await Http.PutAsync($"api/users/{userId}/role?role={newRole}", null);
             await LoadUsers();
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex){
             Console.WriteLine($"Error: {ex.Message}");
         }
     }
 
-    private async Task DeactivateUser(int userId)
-    {
-        try
-        {
+    private async Task DeactivateUser(int userId) {
+        try{
             await Http.PutAsync($"api/users/{userId}/deactivate", null);
             await LoadUsers();
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex){
             Console.WriteLine($"Error: {ex.Message}");
         }
     }
 
-    private async Task ActivateUser(int userId)
-    {
-        try
-        {
+    private async Task ActivateUser(int userId) {
+        try{
             await Http.PutAsync($"api/users/{userId}/activate", null);
             await LoadUsers();
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex){
             Console.WriteLine($"Error: {ex.Message}");
         }
     }
 
-    private void EditUser(int userId)
-    {
+    private void EditUser(int userId) {
         Navigation.NavigateTo($"/users/{userId}/edit");
     }
 
-    private void CreateUser()
-    {
+    private void CreateUser() {
         Navigation.NavigateTo("/users/create");
     }
 
-    public class UserDto
-    {
+    public class UserDto {
         public int Id { get; set; }
         public string Username { get; set; } = "";
         public string Email { get; set; } = "";
@@ -414,4 +399,5 @@
         public bool IsActive { get; set; } = true;
         public DateTime CreatedAt { get; set; }
     }
+
 }

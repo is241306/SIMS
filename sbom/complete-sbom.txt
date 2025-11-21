@@ -1,0 +1,29 @@
+SIMS Project - Software Bill of Materials 
+Generated on: 21-Nov-25 21:26:47.41 
+ 
+========== API DEPENDENCIES ========== 
+Project 'api' has the following package references
+   [net8.0]: 
+   Top-level Package                                      Requested   Resolved
+   > BCrypt.Net-Next                                      4.0.3       4.0.3   
+   > Microsoft.AspNetCore.Authentication.JwtBearer        8.0.0       8.0.0   
+   > Microsoft.EntityFrameworkCore                        8.0.0       8.0.0   
+   > Microsoft.EntityFrameworkCore.InMemory               8.0.0       8.0.0   
+   > Microsoft.EntityFrameworkCore.SqlServer              8.0.0       8.0.0   
+   > Microsoft.EntityFrameworkCore.Tools                  8.0.0       8.0.0   
+   > Microsoft.Extensions.Caching.StackExchangeRedis      8.0.22      8.0.22  
+   > Microsoft.NET.Test.Sdk                               17.8.0      17.8.0  
+   > Moq                                                  4.20.72     4.20.72 
+   > StackExchange.Redis.Extensions.Core                  8.0.5       8.0.5   
+   > Swashbuckle.AspNetCore                               6.6.2       6.6.2   
+   > xunit                                                2.5.3       2.5.3   
+   > xunit.runner.visualstudio                            2.5.3       2.5.3   
+
+ 
+========== FRONTEND DEPENDENCIES ========== 
+Project 'frontend' has the following package references
+   [net8.0]: 
+   Top-level Package                                      Requested   Resolved
+   > Microsoft.Extensions.Caching.StackExchangeRedis      8.0.22      8.0.22  
+   > StackExchange.Redis.Extensions.Core                  8.0.5       8.0.5   
+

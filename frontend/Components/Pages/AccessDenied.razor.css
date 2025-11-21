@@ -1,0 +1,41 @@
+/* Wrapper for the centered card */
+.access-denied-card {
+    max-width: 520px;
+    margin: 3rem auto;
+    text-align: center;
+}
+
+/* Icon styling */
+.access-denied-card .icon {
+    font-size: 4rem;
+    margin-bottom: 1.25rem;
+    color: rgba(239, 68, 68, 0.8);
+}
+
+/* Header */
+.access-denied-card h1 {
+    font-size: 1.9rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: #f9fafb;
+    margin-bottom: 1rem;
+}
+
+.access-denied-card p {
+    color: var(--color-text-muted);
+    margin-bottom: 0.6rem;
+}
+
+.access-denied-card .subtitle {
+    font-size: 0.85rem;
+    margin-bottom: 2rem;
+    opacity: 0.8;
+}
+
+/* Button row */
+.actions {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1.5rem;
+}

@@ -4,250 +4,110 @@
 
 <PageTitle>Logs - SIMS</PageTitle>
 
-<div class="page-wrapper">
+<div class="dashboard-wrapper logs-wrapper">
     <div class="page-header">
-        <h1><i class="bi bi-journal-text"></i> System Logs</h1>
-        <button class="btn-refresh" @onclick="LoadLogs">
-            <i class="bi bi-arrow-repeat"></i> Refresh
+        <h1>
+            <i class="bi bi-journal-text"></i>
+            <span>System Logs</span>
+        </h1>
+
+        <button class="action-btn primary btn-refresh" @onclick="LoadLogs">
+            <i class="bi bi-arrow-repeat"></i>
+            Refresh
         </button>
     </div>
 
     <!-- Filters -->
-    <div class="filters-card">
-        <div class="filter-group">
-            <label>Log Level</label>
-            <select @bind="filterLevel" @bind:event="onchange" class="filter-select">
-                <option value="">All</option>
-                <option value="Info">Info</option>
-                <option value="Warning">Warning</option>
-                <option value="Error">Error</option>
-            </select>
+    <div class="content-card filters-card">
+        <div class="filters-inner">
+            <div class="filter-group">
+                <label>Log Level</label>
+                <select @bind="filterLevel" @bind:event="onchange" class="filter-select">
+                    <option value="">All</option>
+                    <option value="Info">Info</option>
+                    <option value="Warning">Warning</option>
+                    <option value="Error">Error</option>
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label>Time Range</label>
+                <select @bind="filterTimeRange" @bind:event="onchange" class="filter-select">
+                    <option value="1">Last Hour</option>
+                    <option value="24">Last 24 Hours</option>
+                    <option value="168">Last Week</option>
+                    <option value="720">Last Month</option>
+                </select>
+            </div>
+
+            <div class="filters-actions">
+                <button class="action-btn" @onclick="ResetFilters">
+                    <i class="bi bi-arrow-counterclockwise"></i> Reset
+                </button>
+            </div>
         </div>
-        <div class="filter-group">
-            <label>Time Range</label>
-            <select @bind="filterTimeRange" @bind:event="onchange" class="filter-select">
-                <option value="1">Last Hour</option>
-                <option value="24">Last 24 Hours</option>
-                <option value="168">Last Week</option>
-                <option value="720">Last Month</option>
-            </select>
-        </div>
-        <button class="btn-reset" @onclick="ResetFilters">Reset</button>
     </div>
 
     <!-- Logs Table -->
     <div class="content-card">
-        <table class="data-table">
-            <thead>
-            <tr>
-                <th>Timestamp</th>
-                <th>Level</th>
-                <th>Message</th>
-                <th>Source</th>
-            </tr>
-            </thead>
-            <tbody>
-            @if (filteredLogs == null){
+        <div class="card-header">
+            <h2>Logs</h2>
+            <span class="badge-soft">
+                @(filteredLogs?.Count ?? 0) log(s)
+            </span>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table logs-table">
+                <thead>
                 <tr>
-                    <td colspan="4" class="loading">Loading logs...</td>
+                    <th>Timestamp</th>
+                    <th>Level</th>
+                    <th>Message</th>
+                    <th>Source</th>
                 </tr>
-            }
-            else if (!filteredLogs.Any()){
-                <tr>
-                    <td colspan="4" class="no-data">No logs found</td>
-                </tr>
-            }
-            else{
-                @foreach (var log in filteredLogs){
-                    <tr class="table-row">
-                        <td class="log-time">@log.Timestamp.ToString("dd.MM.yyyy HH:mm:ss")</td>
-                        <td>
+                </thead>
+
+                <tbody>
+                @if (filteredLogs == null)
+                {
+                    <tr>
+                        <td colspan="4" class="loading">Loading logs...</td>
+                    </tr>
+                }
+                else if (!filteredLogs.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="no-data">No logs found</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var log in filteredLogs)
+                    {
+                        <tr class="table-row">
+                            <td class="log-time">@log.Timestamp.ToString("dd.MM.yyyy HH:mm:ss")</td>
+                            <td>
                                 <span class="log-level level-@log.Level.ToLower()">
                                     @log.Level
                                 </span>
-                        </td>
-                        <td class="log-message">@log.Message</td>
-                        <td class="log-source">@log.Source</td>
-                    </tr>
+                            </td>
+                            <td class="log-message">@log.Message</td>
+                            <td class="log-source">@log.Source</td>
+                        </tr>
+                    }
                 }
-            }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 </div>
-
-<style>
-    :root {
-        --color-primary: #113B40;
-        --color-success: #038C3E;
-        --color-bg: #F2F2F2;
-        --color-white: #FFFFFF;
-    }
-
-    .page-wrapper {
-        padding: 2rem;
-        max-width: 1400px;
-        margin: 0 auto;
-        background: var(--color-bg);
-        min-height: 100vh;
-    }
-
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 2rem;
-    }
-
-    .page-header h1 {
-        color: var(--color-primary);
-        font-size: 2rem;
-        font-weight: 700;
-    }
-
-    .btn-refresh {
-        padding: 0.75rem 1.5rem;
-        background: var(--color-primary);
-        color: white;
-        border: none;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .btn-refresh:hover {
-        background: var(--color-success);
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(3, 140, 62, 0.3);
-    }
-
-    .filters-card {
-        background: var(--color-white);
-        padding: 1.5rem;
-        border-radius: 12px;
-        margin-bottom: 2rem;
-        display: flex;
-        gap: 1rem;
-        align-items: end;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .filter-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-
-    .filter-group label {
-        font-weight: 600;
-        font-size: 0.875rem;
-        color: var(--color-primary);
-    }
-
-    .filter-select {
-        padding: 0.5rem 1rem;
-        border: 1px solid #E0E0E0;
-        border-radius: 6px;
-        font-size: 0.875rem;
-        min-width: 150px;
-    }
-
-    .btn-reset {
-        padding: 0.5rem 1.5rem;
-        background: #6B7280;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: 600;
-    }
-
-    .content-card {
-        background: var(--color-white);
-        border-radius: 12px;
-        padding: 1.5rem;
-        overflow-x: auto;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-family: 'Courier New', monospace;
-    }
-
-    .data-table th {
-        text-align: left;
-        padding: 1rem;
-        background: var(--color-bg);
-        font-weight: 600;
-        font-size: 0.875rem;
-        text-transform: uppercase;
-        color: var(--color-primary);
-    }
-
-    .data-table td {
-        padding: 1rem;
-        border-bottom: 1px solid #E0E0E0;
-    }
-
-    .table-row:hover {
-        background: var(--color-bg);
-    }
-
-    .log-time {
-        color: #7F8C8D;
-        font-size: 0.875rem;
-        white-space: nowrap;
-    }
-
-    .log-level {
-        padding: 0.375rem 0.75rem;
-        border-radius: 6px;
-        font-size: 0.75rem;
-        font-weight: 700;
-        text-transform: uppercase;
-    }
-
-    .level-info {
-        background: #DBEAFE;
-        color: #3B82F6;
-    }
-
-    .level-warning {
-        background: #FEF3C7;
-        color: #F59E0B;
-    }
-
-    .level-error {
-        background: #FEE2E2;
-        color: #E3342F;
-    }
-
-    .log-message {
-        color: #2C3E50;
-        font-size: 0.9375rem;
-    }
-
-    .log-source {
-        color: #7F8C8D;
-        font-size: 0.875rem;
-    }
-
-    .loading, .no-data {
-        text-align: center;
-        padding: 3rem;
-        color: #6B7280;
-    }
-</style>
 
 @code {
     private List<LogDto>? logs;
     private List<LogDto>? filteredLogs;
 
     private string _filterLevel = "";
-
     private string filterLevel {
         get => _filterLevel;
         set {
@@ -257,7 +117,6 @@
     }
 
     private string _filterTimeRange = "24";
-
     private string filterTimeRange {
         get => _filterTimeRange;
         set {
@@ -272,49 +131,50 @@
 
     private async Task LoadLogs() {
         try{
-            var redisLogs = await Http.GetFromJsonAsync<List<Dictionary<string, object>>>("api/logs/latest?count=100");
+            var redisLogs =
+                await Http.GetFromJsonAsync<List<Dictionary<string, object>>>("api/logs/latest?count=100");
 
-            if (redisLogs != null){
-                logs = redisLogs.Select(log => new LogDto {
-                    Timestamp = log.ContainsKey("Timestamp") && log["Timestamp"] != null
-                        ? DateTime.Parse(log["Timestamp"].ToString()!)
-                        : DateTime.Now,
-                    Level = log.ContainsKey("Level") && log["Level"] != null
-                        ? log["Level"].ToString()!
-                        : "Info",
-                    Message = log.ContainsKey("Message") && log["Message"] != null
-                        ? log["Message"].ToString()!
-                        : "No message",
-                    Source = log.ContainsKey("Source") && log["Source"] != null
-                        ? log["Source"].ToString()!
-                        : "Unknown"
-                }).ToList();
-            }
-            else{
-                logs = new List<LogDto> {
-                    new() { Timestamp = DateTime.Now, Level = "Info", Message = "No logs available in Redis", Source = "System" }
-                };
-            }
+            logs = redisLogs?.Select(log => new LogDto {
+                Timestamp = log.TryGetValue("Timestamp", out var t) && t != null
+                    ? DateTime.Parse(t.ToString()!)
+                    : DateTime.Now,
+                Level = log.TryGetValue("Level", out var lvl) && lvl != null
+                    ? lvl.ToString()!
+                    : "Info",
+                Message = log.TryGetValue("Message", out var msg) && msg != null
+                    ? msg.ToString()!
+                    : "No message",
+                Source = log.TryGetValue("Source", out var src) && src != null
+                    ? src.ToString()!
+                    : "Unknown"
+            }).ToList();
 
+            filteredLogs = logs;
             ApplyFilters();
         }
         catch (Exception ex){
-            Console.WriteLine($"Error loading logs from Redis: {ex.Message}");
             logs = new List<LogDto> {
-                new() { Timestamp = DateTime.Now, Level = "Error", Message = $"Failed to load logs: {ex.Message}", Source = "LogsPage" }
+                new() {
+                    Timestamp = DateTime.Now,
+                    Level = "Error",
+                    Message = $"Failed to load logs: {ex.Message}",
+                    Source = "LogsPage"
+                }
             };
-            ApplyFilters();
+            filteredLogs = logs;
         }
     }
 
     private void ApplyFilters() {
-        var timeRangeHours = int.Parse(filterTimeRange);
-        var cutoffTime = DateTime.Now.AddHours(-timeRangeHours);
+        var hours = int.Parse(filterTimeRange);
+        var cutoff = DateTime.Now.AddHours(-hours);
 
-        filteredLogs = logs?.Where(l =>
-            (string.IsNullOrEmpty(filterLevel) || l.Level == filterLevel) &&
-            l.Timestamp >= cutoffTime
-        ).OrderByDescending(l => l.Timestamp).ToList();
+        filteredLogs = logs?
+            .Where(l =>
+                (string.IsNullOrEmpty(filterLevel) || l.Level == filterLevel) &&
+                l.Timestamp >= cutoff)
+            .OrderByDescending(l => l.Timestamp)
+            .ToList();
     }
 
     private void ResetFilters() {
@@ -329,5 +189,4 @@
         public string Message { get; set; } = "";
         public string Source { get; set; } = "";
     }
-
 }

@@ -1,0 +1,118 @@
+.logs-wrapper {
+    max-width: 1300px;
+}
+
+/* Page Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.75rem;
+}
+
+.page-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.7rem;
+    font-weight: 600;
+    color: #f9fafb;
+}
+
+.page-header i {
+    font-size: 1.4rem;
+    color: var(--color-primary);
+}
+
+/* Refresh button */
+.btn-refresh {
+    white-space: nowrap;
+}
+
+/* Filters Layout */
+.filters-card {
+    margin-bottom: 1.5rem !important;
+}
+
+.filters-inner {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 1.25rem;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.filter-group label {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--color-text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.filter-select {
+    padding: 0.6rem 0.75rem;
+    border-radius: 9px;
+    border: 1px solid rgba(148, 163, 184, 0.7);
+    background: rgba(15, 23, 42, 0.9);
+    color: var(--color-text);
+    font-size: 0.9rem;
+}
+
+.filter-select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.7);
+}
+
+/* Table specifics */
+.logs-table .log-time {
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+.logs-table .log-message {
+    color: #e2e8f0;
+    font-family: "JetBrains Mono", monospace;
+}
+
+.logs-table .log-source {
+    color: #94a3b8;
+    font-size: 0.9rem;
+}
+
+/* Log Level Tags */
+.log-level {
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.level-info {
+    background: rgba(59, 130, 246, 0.18);
+    color: #60a5fa;
+}
+
+.level-warning {
+    background: rgba(251, 191, 36, 0.18);
+    color: #facc15;
+}
+
+.level-error {
+    background: rgba(239, 68, 68, 0.18);
+    color: #fca5a5;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .filters-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}

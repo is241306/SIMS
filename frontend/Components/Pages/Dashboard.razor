@@ -9,7 +9,11 @@
     <div class="dashboard-header">
         <h1>Dashboard</h1>
         <div class="header-actions">
-            <span class="last-update">Last updated: @(DateTime.Now.AddHours(1).ToString("HH:mm:ss"))</span>
+            @{
+                var tz = TimeZoneInfo.FindSystemTimeZoneById("Central European Standard Time");
+                var localTime = TimeZoneInfo.ConvertTime(DateTime.UtcNow, tz);
+            }
+            <span class="last-update">Last updated: @localTime.ToString("HH:mm:ss")</span>
         </div>
     </div>
 

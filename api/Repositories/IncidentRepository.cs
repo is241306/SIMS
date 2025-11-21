@@ -16,8 +16,8 @@ public class IncidentRepository : IIncidentRepository
     public async Task<Incident?> GetByIdAsync(int id)
     {
         return await _context.Incidents
-            .Include(i => i.AssignedUser)   // User assigned to this incident (if any)
-            .Include(i => i.Alert)          // Source alert (if any)
+            .Include(i => i.AssignedUser)
+            .Include(i => i.Alert)
             .FirstOrDefaultAsync(i => i.Id == id);
     }
 

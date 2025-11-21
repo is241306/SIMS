@@ -328,10 +328,7 @@
             var response = await Http.PostAsync($"api/alerts/{alertId}/convert-to-incident", null);
             if (response.IsSuccessStatusCode)
             {
-                // Reload alerts to reflect the status change
                 await LoadAlerts();
-                // Optionally navigate to incidents page
-                // Navigation.NavigateTo("/incidents");
             }
         }
         catch (Exception ex)

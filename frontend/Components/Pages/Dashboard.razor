@@ -533,7 +533,6 @@
         {
             recentIncidents = await Http.GetFromJsonAsync<List<IncidentDto>>("api/incidents");
             
-            // Placeholder alerts
             recentAlerts = new List<AlertDto>
             {
                 new() { AlertId = "ALT001", Description = "Suspicious login attempt detected", Host = "web-server-01", Severity = "Critical", Timestamp = DateTime.Now.AddHours(-2) },

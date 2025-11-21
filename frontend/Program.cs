@@ -17,13 +17,10 @@ builder.Services.AddScoped(sp =>
 
 var app = builder.Build();
 
-// 2. Middleware
 if (!app.Environment.IsDevelopment()){
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     app.UseHsts();
 }
-
-// app.UseHttpsRedirection();
 
 app.UseStaticFiles();
 app.UseAntiforgery();

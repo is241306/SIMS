@@ -16,14 +16,14 @@ public class AlertRepository : IAlertRepository
     public async Task<Alert?> GetByIdAsync(int id)
     {
         return await _context.Alerts
-            .Include(a => a.Incidents)   // if Alert has navigation property Incidents
+            .Include(a => a.Incidents)
             .FirstOrDefaultAsync(a => a.Id == id);
     }
 
     public async Task<IReadOnlyList<Alert>> GetAllAsync()
     {
         return await _context.Alerts
-            .Include(a => a.Incidents)   // remove this Include if you do not want incidents every time
+            .Include(a => a.Incidents)
             .ToListAsync();
     }
 

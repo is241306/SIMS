@@ -9,7 +9,6 @@ namespace api.Data
     {
         public static void Seed(SimsContext db)
         {
-            // Seed Roles
             if (!db.Roles.Any())
             {
                 db.Roles.AddRange(
@@ -19,10 +18,9 @@ namespace api.Data
                 db.SaveChanges();
             }
 
-            // Seed Users
+            // Testbenutzer erstellen
             if (!db.Users.Any())
             {
-                // Create test users with properly hashed passwords
                 var users = new[]
                 {
                     CreateUser("admin", "admin123"),
@@ -34,7 +32,6 @@ namespace api.Data
                 db.SaveChanges();
             }
 
-            // Seed Incidents
             if (!db.Incidents.Any())
             {
                 var incidents = new[]
@@ -94,7 +91,6 @@ namespace api.Data
                 db.SaveChanges();
             }
 
-            // Seed Alerts
             if (!db.Alerts.Any())
             {
                 var alerts = new[]

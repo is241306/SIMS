@@ -10,5 +10,6 @@ namespace api.Services.Interfaces
         Task<bool> DeleteAsync(int id);
         Task<bool> CreateIncidentFromAlertAsync(CreateIncidentFromAlertDto dto);
         Task<bool> EscalateAsync(int id);
+        Task<int?> ConvertToIncidentAsync(int alertId);
     }
 }

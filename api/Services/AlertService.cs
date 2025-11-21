@@ -102,11 +102,46 @@ namespace api.Services
             return true;
         }
 
+        public async Task<int?> ConvertToIncidentAsync(int alertId)
+        {
+            var alert = await _alertRepository.GetByIdAsync(alertId);
+            if (alert == null)
+                return null;
+
+            // Map alert level to incident severity
+            var severity = alert.AlertLevel switch
+            {
+                1 => IncidentSeverity.Low,
+                2 => IncidentSeverity.Medium,
+                3 => IncidentSeverity.High,
+                4 => IncidentSeverity.Critical,
+                _ => IncidentSeverity.Medium
+            };
+
+            var incident = new Incident
+            {
+                Description = $"{alert.Description} (from alert {alert.AlertExternalId})",
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                Severity = severity,
+                Status = IncidentStatus.New,
+                AlertId = alert.Id
+            };
+
+            await _incidentRepository.AddAsync(incident);
+
+            // Update alert status to indicate it's been converted
+            alert.Status = "Resolved";
+            await _alertRepository.UpdateAsync(alert);
+
+            return incident.Id;
+        }
 
         private AlertDto MapToDto(Alert alert)
         {
             return new AlertDto
             {
+                Id = alert.Id,
                 AlertId = alert.AlertExternalId,
                 Description = alert.Description,
                 Host = alert.Host,

@@ -48,5 +48,14 @@ namespace api.Controllers
             if (!success) return NotFound();
             return NoContent();
         }
+
+        // POST api/alerts/{id}/convert-to-incident
+        [HttpPost("{id:int}/convert-to-incident")]
+        public async Task<IActionResult> ConvertToIncident(int id)
+        {
+            var incidentId = await _alertService.ConvertToIncidentAsync(id);
+            if (incidentId == null) return NotFound();
+            return Ok(new { incidentId });
+        }
     }
 }

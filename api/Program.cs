@@ -95,12 +95,15 @@ public class Program {
         var app = builder.Build();
 
         // ------------------------------
-        // Apply EF Core Migrations
+        // Apply EF Core Migrations & Seed Database
         // ------------------------------
         using (var scope = app.Services.CreateScope()){
             try{
                 var db = scope.ServiceProvider.GetRequiredService<SimsContext>();
                 db.Database.Migrate();
+                
+                // Seed database with sample data
+                DbSeeder.Seed(db);
             }
             catch (Exception ex){
                 Console.WriteLine($"Migration failed: {ex.Message}");

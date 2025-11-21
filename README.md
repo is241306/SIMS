@@ -9,26 +9,57 @@ SIMS is a system for logging and managing IT security incidents. It provides inc
 ---
 
 ## 🧩 Features
-- Manual recording of security incidents (assignee, reporter, severity, status, CVE, system, description, timestamp, etc.)
-- Incident escalation (e.g., to next user or predefined level)
-- User management with roles (e.g., Administrator, User)
-- Logging using SQL or Redis: ID, timestamp, log level, message
-- Core functionality:
-    - User login
-    - Add/Edit/Close incidents
-    - Escalation
-    - Add/Disable users
-    - List incidents and users
+
+- **Role-based Authentication & Authorization**  
+  - Local credential authentication (username/password)  
+  - Token-style session handling (JWT-inspired structure stored client-side)  
+  - Role enforcement (Administrator / User)  
+  - Protected routes and restricted actions based on permissions  
+
+- **Incident Lifecycle Management**  
+  - Create, view, edit, and delete incidents  
+  - Structured fields: severity, status, system, CVE, description, reporter, assignee  
+  - Accurate timestamp handling with automatic daylight-saving adjustments  
+  - Validation and meaningful error states for missing or invalid incidents  
+
+- **User & Role Administration**  
+  - Full CRUD for users  
+  - Role assignment and permission enforcement  
+  - Secure password handling  
+
+- **Centralized Logging**  
+  - Logs persisted to SQL Server or Redis  
+  - Captures timestamp, log level, and message context  
+  - Supports auditing and system monitoring  
+
+- **Service & Data Layers**  
+  - Clear separation between UI, business logic, and persistence  
+  - Repository abstraction for database interactions  
+  - Strong async service patterns  
 
 ---
 
 ## 🛠 Tech Stack
-- **Backend:** C#, ASP.NET Core Web API
-- **ORM:** Entity Framework Core
-- **Databases:** SQL Server (relational), Redis (session/log caching)
-- **Containerization:** Docker (4 containers: App, API, SQL Server, Redis)
-- **Static Analysis:** Semgrep for SAST
-- **Frontend:** Blazor
+
+- **.NET 8**  
+- **ASP.NET Core / Blazor Server**  
+- **Entity Framework Core**  
+- **SQL Server** (primary database)  
+- **Redis** (optional, for log storage)  
+- **Token-style auth (JWT-like)** stored in session/local storage  
+- **Dependency Injection** via .NET built-in DI  
+- **Async/await** used across services and repositories  
+
+### **Frontend**
+- **Blazor Server (InteractiveServer)**  
+- **Razor Components**  
+- **Bootstrap Icons**  
+
+### **DevOps / Operations**
+- **Docker & Docker Compose**  
+- **Semgrep** for SAST  
+- **Environment-based configuration**  
+- **Git branching workflow** 
 
 ---
 
@@ -46,11 +77,31 @@ Diagram:
 ---
 
 ## 🔒 Security Considerations
-- **Authentication:** Password hashing
-- **Authorization:** Role-based access control
-- **Data Protection:** Use parameterized queries / EF Core to prevent SQL Injection
-- **Secrets Management:** Redis or AWS Secret Manager (for sensitive session info)
-- **Logging:** Secure logging, avoiding sensitive data in plain text
+- **Token-based Authentication**  
+  - JWT-style structured token stored in browser storage  
+  - Contains identity + role information  
+  - Validated server-side for privileged operations  
+
+- **Role-Based Access Control (RBAC)**  
+  - Admins manage users  
+  - Users have restricted access and cannot reach admin-only operations  
+
+- **Secure Password Handling**  
+  - Passwords hashed before storage  
+  - Never exposed in logs or responses  
+
+- **Input Validation**  
+  - Server-side validation for incidents, login, and user management  
+  - Protects against malformed or malicious input  
+
+- **Audit & Activity Logging**  
+  - Logs all relevant actions  
+  - Optionally backed by Redis for high throughput  
+  - Each entry includes level, timestamp, message  
+
+- **Environment Security**  
+  - Secrets injected via environment variables in Docker  
+  - Configurable connection strings per environment
 
 ---
 

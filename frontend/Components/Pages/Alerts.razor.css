@@ -1,0 +1,110 @@
+/* Page title row */
+.page-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.page-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #f9fafb;
+}
+
+.page-header i {
+    font-size: 1.4rem;
+    color: var(--color-primary);
+}
+
+/* Filters card uses the global .content-card base */
+
+.filters-card {
+    margin-bottom: 1.5rem;
+}
+
+.filters-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.25rem;
+    align-items: flex-end;
+}
+
+/* Individual filter groups */
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 160px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--color-text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.filter-select,
+.filter-input {
+    padding: 0.45rem 0.75rem;
+    border-radius: 9px;
+    border: 1px solid rgba(148, 163, 184, 0.6);
+    font-size: 0.85rem;
+    background: rgba(15, 23, 42, 0.9);
+    color: var(--color-text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.filter-select:focus,
+.filter-input:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.6);
+    background: rgba(15, 23, 42, 0.98);
+}
+
+/* Filters action area (Reset button wrapper) */
+
+.filters-actions {
+    margin-left: auto;
+}
+
+/* Soft badge in card header */
+.badge-soft {
+    padding: 0.2rem 0.65rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.65);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+/* Convert button with green accent */
+
+.btn-convert {
+    padding: 0.45rem 0.9rem;
+    border-radius: 999px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+
+    background: linear-gradient(135deg, #22c55e, #4ade80);
+    color: #f9fafb;
+    box-shadow: 0 10px 30px rgba(22, 163, 74, 0.45);
+    transition: transform 0.15s ease, box-shadow 0.15s ease, filter 0.15s ease;
+}
+
+.btn-convert:hover {
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+    box-shadow: 0 16px 40px rgba(22, 163, 74, 0.65);
+}

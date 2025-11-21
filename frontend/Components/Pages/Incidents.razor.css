@@ -1,0 +1,201 @@
+/* Page width */
+.incidents-wrapper {
+    max-width: 1200px;
+}
+
+/* Header */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.75rem;
+}
+
+.page-header h1 {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #f9fafb;
+}
+
+.page-header i {
+    font-size: 1.4rem;
+    color: var(--color-primary);
+}
+
+/* Create button = just a primary action-btn variant */
+.btn-create {
+    white-space: nowrap;
+}
+
+/* Filters card */
+.filters-card {
+    margin-bottom: 1.5rem;
+}
+
+.filters-inner {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem 1.25rem;
+    align-items: flex-end;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    min-width: 170px;
+}
+
+.filter-group label {
+    font-weight: 600;
+    font-size: 0.8rem;
+    color: var(--color-text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+}
+
+.filter-select {
+    padding: 0.5rem 0.75rem;
+    border-radius: 9px;
+    border: 1px solid rgba(148, 163, 184, 0.7);
+    font-size: 0.85rem;
+    background: rgba(15, 23, 42, 0.9);
+    color: var(--color-text);
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+}
+
+.filter-select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.7);
+    background: rgba(15, 23, 42, 0.98);
+}
+
+.filters-actions {
+    margin-left: auto;
+}
+
+/* Soft info badge in card header */
+.badge-soft {
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.7);
+    font-size: 0.75rem;
+    color: var(--color-text-muted);
+}
+
+/* ID cell */
+.incident-id {
+    font-weight: 700;
+    color: #e5e7eb;
+    cursor: pointer;
+}
+
+.incident-id:hover {
+    text-decoration: underline;
+}
+
+/* Status & assign dropdowns in table */
+.status-select,
+.assign-select {
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.7);
+    font-size: 0.8rem;
+    font-weight: 600;
+    background: rgba(15, 23, 42, 0.9);
+    color: var(--color-text);
+    cursor: pointer;
+    outline: none;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, transform 0.1s ease;
+}
+
+.status-select:hover,
+.assign-select:hover {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 1px rgba(139, 92, 246, 0.7);
+}
+
+/* Status color hints via text color */
+.status-new {
+    color: #9ca3af;
+}
+
+.status-open {
+    color: #bfdbfe;
+}
+
+.status-inprogress {
+    color: #facc15;
+}
+
+.status-resolved {
+    color: #bbf7d0;
+}
+
+.status-escalated {
+    color: #fecaca;
+}
+
+/* Action buttons (view / edit icons) */
+.action-buttons {
+    display: flex;
+    gap: 0.35rem;
+}
+
+.btn-icon-action {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    border: 1px solid rgba(148, 163, 184, 0.5);
+    background: rgba(15, 23, 42, 0.95);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease, background 0.15s ease;
+    color: var(--color-text-soft);
+}
+
+.btn-icon-action:hover {
+    transform: translateY(-1px) scale(1.03);
+    border-color: rgba(248, 250, 252, 0.9);
+    background: rgba(15, 23, 42, 1);
+    box-shadow: 0 12px 35px rgba(15, 23, 42, 0.9);
+}
+
+.btn-icon-action i {
+    pointer-events: none;
+}
+
+/* Optional: slightly distinguish edit vs view */
+.btn-view i {
+    color: #a5b4fc;
+}
+
+.btn-edit i {
+    color: #fbbf24;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .filters-inner {
+        align-items: flex-start;
+    }
+}
+
+@media (max-width: 640px) {
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.75rem;
+    }
+
+    .filters-actions {
+        margin-left: 0;
+    }
+}

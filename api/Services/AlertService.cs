@@ -25,7 +25,10 @@ namespace api.Services
         public async Task<AlertDto?> GetByIdAsync(int id)
         {
             var alert = await _alertRepository.GetByIdAsync(id);
-            return alert == null ? null : MapToDto(alert);
+            if (alert == null) 
+                return null;
+            
+            return MapToDto(alert);
         }
 
         public async Task<AlertDto> CreateAsync(AlertDto dto)
@@ -108,7 +111,6 @@ namespace api.Services
             if (alert == null)
                 return null;
 
-            // Map alert level to incident severity
             var severity = alert.AlertLevel switch
             {
                 1 => IncidentSeverity.Low,
@@ -130,7 +132,6 @@ namespace api.Services
 
             await _incidentRepository.AddAsync(incident);
 
-            // Update alert status to indicate it's been converted
             alert.Status = "Resolved";
             await _alertRepository.UpdateAsync(alert);
 

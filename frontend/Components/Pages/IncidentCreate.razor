@@ -353,7 +353,6 @@
     {
         await LoadUsers();
         
-        // Set defaults
         incident.Status = "New";
         incident.Severity = "Medium";
     }
@@ -366,7 +365,6 @@
         }
         catch
         {
-            // Fallback users
             users = new List<UserDto>
             {
                 new() { Id = 1, Name = "John Doe" },

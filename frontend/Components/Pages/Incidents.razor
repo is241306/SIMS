@@ -351,7 +351,6 @@
         {
             incidents = await Http.GetFromJsonAsync<List<IncidentDto>>("api/incidents");
             
-            // Placeholder users
             users = new List<UserDto>
             {
                 new() { Id = 1, Name = "John Doe" },

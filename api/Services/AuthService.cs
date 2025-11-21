@@ -10,22 +10,25 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-
 namespace api.Services;
 
-public class AuthService : IAuthService {
+public class AuthService : IAuthService 
+{
     private readonly SimsContext _context;
     private readonly IConfiguration _config;
 
-    public AuthService(SimsContext context, IConfiguration config) {
+    public AuthService(SimsContext context, IConfiguration config) 
+    {
         _context = context;
         _config = config;
     }
 
-    public async Task<bool> RegisterAsync(RegisterDto dto) {
+    public async Task<bool> RegisterAsync(RegisterDto dto) 
+    {
         if (_context.Users.Any(u => u.Username == dto.Username))
             return false;
 
+        // Passwort hashen mit PBKDF2
         var salt = RandomNumberGenerator.GetBytes(16);
         var hash = Convert.ToBase64String(KeyDerivation.Pbkdf2(
             password: dto.Password,
@@ -35,7 +38,8 @@ public class AuthService : IAuthService {
             numBytesRequested: 32
         ));
 
-        var user = new User {
+        var user = new User 
+        {
             Username = dto.Username,
             PasswordHash = hash,
             PasswordSalt = Convert.ToBase64String(salt)
@@ -46,7 +50,8 @@ public class AuthService : IAuthService {
         return true;
     }
 
-    public async Task<LoginResponseDto?> LoginAsync(LoginDto dto) {
+    public async Task<LoginResponseDto?> LoginAsync(LoginDto dto) 
+    {
         var user = _context.Users.FirstOrDefault(u => u.Username == dto.Username);
         if (user == null)
             return null;
@@ -65,7 +70,8 @@ public class AuthService : IAuthService {
 
         var token = GenerateJwtToken(user);
 
-        return new LoginResponseDto {
+        return new LoginResponseDto 
+        {
             Token = token,
             ExpiresAt = DateTime.UtcNow.AddHours(1),
             Username = user.Username,
@@ -73,11 +79,13 @@ public class AuthService : IAuthService {
         };
     }
 
-    private string GenerateJwtToken(User user) {
+    private string GenerateJwtToken(User user) 
+    {
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        var claims = new List<Claim> {
+        var claims = new List<Claim> 
+        {
             new Claim(JwtRegisteredClaimNames.Sub, user.Username),
             new Claim("uid", user.Id.ToString()),
             new Claim(ClaimTypes.Role, "User")

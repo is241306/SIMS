@@ -334,7 +334,6 @@
         catch (Exception ex)
         {
             errorMessage = $"Error loading incident: {ex.Message}";
-            // Fallback users
             users = new List<UserDto>
             {
                 new() { Id = 1, Name = "John Doe" },

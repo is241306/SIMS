@@ -267,7 +267,6 @@
     {
         try
         {
-            // Lade echte Logs von Redis via API
             var redisLogs = await Http.GetFromJsonAsync<List<Dictionary<string, object>>>("api/logs/latest?count=100");
             
             if (redisLogs != null)
@@ -290,7 +289,6 @@
             }
             else
             {
-                // Fallback wenn Redis leer ist
                 logs = new List<LogDto>
                 {
                     new() { Timestamp = DateTime.Now, Level = "Info", Message = "No logs available in Redis", Source = "System" }
@@ -302,7 +300,6 @@
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading logs from Redis: {ex.Message}");
-            // Fallback bei Fehler
             logs = new List<LogDto>
             {
                 new() { Timestamp = DateTime.Now, Level = "Error", Message = $"Failed to load logs: {ex.Message}", Source = "LogsPage" }

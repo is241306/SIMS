@@ -7,8 +7,8 @@
 
 <div class="page-wrapper">
     <div class="page-header">
-        <h1>📋 Incidents Management</h1>
-        <button class="btn-create" @onclick="CreateIncident">+ New Incident</button>
+        <h1><i class="bi bi-clipboard-data"></i> Incidents Management</h1>
+        <button class="btn-create" @onclick="CreateIncident"><i class="bi bi-plus-circle"></i> New Incident</button>
     </div>
 
     <!-- Filters -->
@@ -41,73 +41,74 @@
     <div class="content-card">
         <table class="data-table">
             <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Description</th>
-                    <th>Severity</th>
-                    <th>Status</th>
-                    <th>Assigned To</th>
-                    <th>Created</th>
-                    <th>Actions</th>
-                </tr>
+            <tr>
+                <th>ID</th>
+                <th>Description</th>
+                <th>Severity</th>
+                <th>Status</th>
+                <th>Assigned To</th>
+                <th>Created</th>
+                <th>Actions</th>
+            </tr>
             </thead>
             <tbody>
-                @if (filteredIncidents == null)
-                {
-                    <tr><td colspan="7" class="loading">Loading...</td></tr>
-                }
-                else if (!filteredIncidents.Any())
-                {
-                    <tr><td colspan="7" class="no-data">No incidents found</td></tr>
-                }
-                else
-                {
-                    @foreach (var incident in filteredIncidents)
-                    {
-                        <tr class="table-row">
-                            <td class="incident-id" @onclick="() => ViewDetails(incident.Id)">IN@incident.Id</td>
-                            <td @onclick="() => ViewDetails(incident.Id)">@incident.Description</td>
-                            <td>
+            @if (filteredIncidents == null){
+                <tr>
+                    <td colspan="7" class="loading">Loading...</td>
+                </tr>
+            }
+            else if (!filteredIncidents.Any()){
+                <tr>
+                    <td colspan="7" class="no-data">No incidents found</td>
+                </tr>
+            }
+            else{
+                @foreach (var incident in filteredIncidents){
+                    <tr class="table-row">
+                        <td class="incident-id" @onclick="() => ViewDetails(incident.Id)">IN@incident.Id</td>
+                        <td @onclick="() => ViewDetails(incident.Id)">@incident.Description</td>
+                        <td>
                                 <span class="severity-badge severity-@incident.Severity.ToString().ToLower()">
                                     @incident.Severity
                                 </span>
-                            </td>
-                            <td>
-                                <select class="status-select status-@incident.Status.ToString().ToLower()" 
-                                        value="@incident.Status" 
-                                        @onchange="@(async (e) => await ChangeStatus(incident.Id, e.Value?.ToString() ?? string.Empty))">
-                                    <option value="New">New</option>
-                                    <option value="Open">Open</option>
-                                    <option value="InProgress">Investigating</option>
-                                    <option value="Resolved">Resolved</option>
-                                    <option value="Escalated">Escalated</option>
-                                </select>
-                            </td>
-                            <td>
-                                <select class="assign-select" 
-                                        value="@(incident.AssignedId ?? 0)" 
-                                        @onchange="@(async (e) => await AssignUser(incident.Id, int.Parse(e.Value?.ToString() ?? "0")))">
-                                    <option value="0">Unassigned</option>
-                                    @foreach (var user in users)
-                                    {
-                                        <option value="@user.Id">@user.Name</option>
-                                    }
-                                </select>
-                            </td>
-                            <td>@incident.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-action btn-view" @onclick="() => ViewDetails(incident.Id)" title="View Details">
-                                        👁️
-                                    </button>
-                                    <button class="btn-action btn-edit" @onclick="() => EditIncident(incident.Id)" title="Edit">
-                                        ✏️
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
+                        </td>
+                        <td>
+                            <select class="status-select status-@incident.Status.ToString().ToLower()"
+                                    value="@incident.Status"
+                                    @onchange="@(async (e) => await ChangeStatus(incident.Id, e.Value?.ToString() ?? string.Empty))">
+                                <option value="New">New</option>
+                                <option value="Open">Open</option>
+                                <option value="InProgress">Investigating</option>
+                                <option value="Resolved">Resolved</option>
+                                <option value="Escalated">Escalated</option>
+                            </select>
+                        </td>
+                        <td>
+                            <select class="assign-select"
+                                    value="@(incident.AssignedId ?? 0)"
+                                    @onchange="@(async (e) => await AssignUser(incident.Id, int.Parse(e.Value?.ToString() ?? "0")))">
+                                <option value="0">Unassigned</option>
+                                @foreach (var user in users){
+                                    <option value="@user.Id">@user.Name</option>
+                                }
+                            </select>
+                        </td>
+                        <td>@incident.CreatedAt.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn-action btn-view" @onclick="() => ViewDetails(incident.Id)"
+                                        title="View Details">
+                                    <i class="bi bi-eye-fill"></i>
+                                </button>
+                                <button class="btn-action btn-edit" @onclick="() => EditIncident(incident.Id)"
+                                        title="Edit">
+                                    <i class="bi bi-pencil-square"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
                 }
+            }
             </tbody>
         </table>
     </div>
@@ -171,7 +172,7 @@
         display: flex;
         gap: 1rem;
         align-items: end;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .filter-group {
@@ -209,7 +210,7 @@
         border-radius: 12px;
         padding: 1.5rem;
         overflow-x: auto;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .data-table {
@@ -288,11 +289,25 @@
         border-color: var(--color-primary);
     }
 
-    .status-new { color: #6B7280; }
-    .status-open { color: #3B82F6; }
-    .status-inprogress { color: #F59E0B; }
-    .status-resolved { color: #038C3E; }
-    .status-escalated { color: #E3342F; }
+    .status-new {
+        color: #6B7280;
+    }
+
+    .status-open {
+        color: #3B82F6;
+    }
+
+    .status-inprogress {
+        color: #F59E0B;
+    }
+
+    .status-resolved {
+        color: #038C3E;
+    }
+
+    .status-escalated {
+        color: #E3342F;
+    }
 
     .action-buttons {
         display: flex;
@@ -325,105 +340,94 @@
     private List<IncidentDto>? incidents;
     private List<IncidentDto>? filteredIncidents;
     private List<UserDto> users = new();
-    
+
     private string _filterStatus = "";
-    private string filterStatus 
-    { 
-        get => _filterStatus; 
-        set { _filterStatus = value; ApplyFilters(); } 
-    }
-    
-    private string _filterSeverity = "";
-    private string filterSeverity 
-    { 
-        get => _filterSeverity; 
-        set { _filterSeverity = value; ApplyFilters(); } 
+
+    private string filterStatus {
+        get => _filterStatus;
+        set {
+            _filterStatus = value;
+            ApplyFilters();
+        }
     }
 
-    protected override async Task OnInitializedAsync()
-    {
+    private string _filterSeverity = "";
+
+    private string filterSeverity {
+        get => _filterSeverity;
+        set {
+            _filterSeverity = value;
+            ApplyFilters();
+        }
+    }
+
+    protected override async Task OnInitializedAsync() {
         await LoadData();
     }
 
-    private async Task LoadData()
-    {
-        try
-        {
+    private async Task LoadData() {
+        try{
             incidents = await Http.GetFromJsonAsync<List<IncidentDto>>("api/incidents");
-            
-            users = new List<UserDto>
-            {
+
+            users = new List<UserDto> {
                 new() { Id = 1, Name = "John Doe" },
                 new() { Id = 2, Name = "Jane Smith" },
                 new() { Id = 3, Name = "Bob Johnson" }
             };
-            
+
             ApplyFilters();
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex){
             Console.WriteLine($"Error: {ex.Message}");
         }
     }
 
-    private void ApplyFilters()
-    {
+    private void ApplyFilters() {
         filteredIncidents = incidents?.Where(i =>
             (string.IsNullOrEmpty(filterStatus) || i.Status.ToString() == filterStatus) &&
             (string.IsNullOrEmpty(filterSeverity) || i.Severity.ToString() == filterSeverity)
         ).ToList();
     }
 
-    private void ResetFilters()
-    {
+    private void ResetFilters() {
         filterStatus = "";
         filterSeverity = "";
         ApplyFilters();
     }
 
-    private async Task ChangeStatus(int id, string newStatus)
-    {
-        try
-        {
+    private async Task ChangeStatus(int id, string newStatus) {
+        try{
             await Http.PutAsync($"api/incidents/{id}/status?status={newStatus}", null);
             await LoadData();
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex){
             Console.WriteLine($"Error: {ex.Message}");
         }
     }
 
-    private async Task AssignUser(int incidentId, int userId)
-    {
-        try
-        {
+    private async Task AssignUser(int incidentId, int userId) {
+        try{
             await Http.PutAsync($"api/incidents/{incidentId}/assign?userId={userId}", null);
             await LoadData();
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex){
             Console.WriteLine($"Error: {ex.Message}");
         }
     }
 
-    private void ViewDetails(int id)
-    {
+    private void ViewDetails(int id) {
         Navigation.NavigateTo($"/incidents/{id}");
     }
 
-    private void EditIncident(int id)
-    {
+    private void EditIncident(int id) {
         Navigation.NavigateTo($"/incidents/{id}/edit");
     }
 
-    private void CreateIncident()
-    {
+    private void CreateIncident() {
         Navigation.NavigateTo("/incidents/create");
     }
 
-    public class IncidentDto
-    {
+    public class IncidentDto {
         public int Id { get; set; }
         public string Description { get; set; } = "";
         public DateTime CreatedAt { get; set; }
@@ -432,12 +436,24 @@
         public int? AssignedId { get; set; }
     }
 
-    public class UserDto
-    {
+    public class UserDto {
         public int Id { get; set; }
         public string Name { get; set; } = "";
     }
 
-    public enum IncidentStatus { New, Open, InProgress, Resolved, Escalated }
-    public enum IncidentSeverity { Low, Medium, High, Critical }
+    public enum IncidentStatus {
+        New,
+        Open,
+        InProgress,
+        Resolved,
+        Escalated
+    }
+
+    public enum IncidentSeverity {
+        Low,
+        Medium,
+        High,
+        Critical
+    }
+
 }

@@ -7,20 +7,17 @@
 <PageTitle>Incident #@Id - SIMS</PageTitle>
 
 <div class="page-wrapper">
-    @if (loading)
-    {
-        <div class="loading">⏳ Loading incident...</div>
+    @if (loading){
+        <div class="loading"><i class="bi bi-hourglass-split"></i> Loading incident...</div>
     }
-    else if (incident == null)
-    {
+    else if (incident == null){
         <div class="error-card">
-            <h2>❌ Incident Not Found</h2>
+            <h2><i class="bi bi-x-octagon-fill"></i> Incident Not Found</h2>
             <p>The incident with ID @Id could not be found.</p>
             <button class="btn-primary" @onclick="GoBack">Go Back</button>
         </div>
     }
-    else
-    {
+    else{
         <div class="detail-header">
             <div class="header-left">
                 <h1>Incident #@incident.Id</h1>
@@ -34,32 +31,29 @@
                 </div>
             </div>
             <div class="header-actions">
-                @if (!isEditing)
-                {
-                    <button class="btn-edit" @onclick="ToggleEdit">✏️ Edit</button>
+                @if (!isEditing){
+                    <button class="btn-edit" @onclick="ToggleEdit"><i class="bi bi-pencil-square"></i> Edit</button>
                 }
-                else
-                {
-                    <button class="btn-save" @onclick="SaveIncident">💾 Save</button>
-                    <button class="btn-cancel" @onclick="CancelEdit">❌ Cancel</button>
+                else{
+                    <button class="btn-save" @onclick="SaveIncident"><i class="bi bi-save"></i> Save</button>
+                    <button class="btn-cancel" @onclick="CancelEdit"><i class="bi bi-x-circle"></i> Cancel</button>
                 }
-                <button class="btn-back" @onclick="GoBack">← Back</button>
+                <button class="btn-back" @onclick="GoBack"><i class="bi bi-arrow-left"></i> Back</button>
             </div>
         </div>
 
         <div class="detail-content">
             <!-- Info Card -->
             <div class="content-card">
-                <h2>📋 Details</h2>
-                
-                @if (isEditing)
-                {
+                <h2><i class="bi bi-clipboard-data"></i> Details</h2>
+
+                @if (isEditing){
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Description</label>
                             <textarea @bind="incident.Description" rows="4" class="form-input"></textarea>
                         </div>
-                        
+
                         <div class="form-group">
                             <label>Severity</label>
                             <select @bind="incident.Severity" class="form-input">
@@ -69,7 +63,7 @@
                                 <option value="@IncidentSeverity.Critical">Critical</option>
                             </select>
                         </div>
-                        
+
                         <div class="form-group">
                             <label>Status</label>
                             <select @bind="incident.Status" class="form-input">
@@ -82,8 +76,7 @@
                         </div>
                     </div>
                 }
-                else
-                {
+                else{
                     <div class="info-grid">
                         <div class="info-item">
                             <span class="info-label">Description:</span>
@@ -97,8 +90,7 @@
                             <span class="info-label">Updated:</span>
                             <span class="info-value">@incident.UpdatedAt.ToString("dd.MM.yyyy HH:mm")</span>
                         </div>
-                        @if (incident.ClosedAt.HasValue)
-                        {
+                        @if (incident.ClosedAt.HasValue){
                             <div class="info-item">
                                 <span class="info-label">Closed:</span>
                                 <span class="info-value">@incident.ClosedAt.Value.ToString("dd.MM.yyyy HH:mm")</span>
@@ -110,7 +102,7 @@
 
             <!-- Timeline -->
             <div class="content-card">
-                <h2>📅 Timeline</h2>
+                <h2><i class="bi bi-calendar-event"></i> Timeline</h2>
                 <div class="timeline">
                     <div class="timeline-item">
                         <div class="timeline-marker created"></div>
@@ -119,9 +111,8 @@
                             <div class="timeline-time">@incident.CreatedAt.ToString("dd.MM.yyyy HH:mm")</div>
                         </div>
                     </div>
-                    
-                    @if (incident.Status == IncidentStatus.InProgress)
-                    {
+
+                    @if (incident.Status == IncidentStatus.InProgress){
                         <div class="timeline-item">
                             <div class="timeline-marker progress"></div>
                             <div class="timeline-content">
@@ -130,9 +121,8 @@
                             </div>
                         </div>
                     }
-                    
-                    @if (incident.Status == IncidentStatus.Resolved && incident.ClosedAt.HasValue)
-                    {
+
+                    @if (incident.Status == IncidentStatus.Resolved && incident.ClosedAt.HasValue){
                         <div class="timeline-item">
                             <div class="timeline-marker resolved"></div>
                             <div class="timeline-content">
@@ -174,7 +164,7 @@
         background: white;
         padding: 1.5rem;
         border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .header-left h1 {
@@ -195,16 +185,50 @@
         text-transform: uppercase;
     }
 
-    .severity-critical { background: #FEE2E2; color: var(--severity-critical); }
-    .severity-high { background: #DBEAFE; color: var(--severity-high); }
-    .severity-medium { background: #FEF3C7; color: #92400E; }
-    .severity-low { background: #F3F4F6; color: var(--severity-low); }
+    .severity-critical {
+        background: #FEE2E2;
+        color: var(--severity-critical);
+    }
 
-    .status-new { background: #F3F4F6; color: #6B7280; }
-    .status-open { background: #DBEAFE; color: #3B82F6; }
-    .status-inprogress { background: #FEF3C7; color: #F59E0B; }
-    .status-resolved { background: #D1FAE5; color: var(--color-success); }
-    .status-escalated { background: #FEE2E2; color: #E3342F; }
+    .severity-high {
+        background: #DBEAFE;
+        color: var(--severity-high);
+    }
+
+    .severity-medium {
+        background: #FEF3C7;
+        color: #92400E;
+    }
+
+    .severity-low {
+        background: #F3F4F6;
+        color: var(--severity-low);
+    }
+
+    .status-new {
+        background: #F3F4F6;
+        color: #6B7280;
+    }
+
+    .status-open {
+        background: #DBEAFE;
+        color: #3B82F6;
+    }
+
+    .status-inprogress {
+        background: #FEF3C7;
+        color: #F59E0B;
+    }
+
+    .status-resolved {
+        background: #D1FAE5;
+        color: var(--color-success);
+    }
+
+    .status-escalated {
+        background: #FEE2E2;
+        color: #E3342F;
+    }
 
     .header-actions {
         display: flex;
@@ -220,15 +244,34 @@
         transition: all 0.3s ease;
     }
 
-    .btn-edit { background: var(--color-primary); color: white; }
-    .btn-save { background: var(--color-success); color: white; }
-    .btn-cancel { background: #6B7280; color: white; }
-    .btn-back { background: #E5E7EB; color: #374151; }
-    .btn-primary { background: var(--color-primary); color: white; }
+    .btn-edit {
+        background: var(--color-primary);
+        color: white;
+    }
+
+    .btn-save {
+        background: var(--color-success);
+        color: white;
+    }
+
+    .btn-cancel {
+        background: #6B7280;
+        color: white;
+    }
+
+    .btn-back {
+        background: #E5E7EB;
+        color: #374151;
+    }
+
+    .btn-primary {
+        background: var(--color-primary);
+        color: white;
+    }
 
     .btn-edit:hover, .btn-save:hover, .btn-cancel:hover, .btn-back:hover, .btn-primary:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
     }
 
     .detail-content {
@@ -241,7 +284,7 @@
         background: white;
         padding: 1.5rem;
         border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .content-card h2 {
@@ -368,7 +411,7 @@
         padding: 3rem;
         background: white;
         border-radius: 12px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .error-card h2 {
@@ -378,67 +421,54 @@
 </style>
 
 @code {
-    [Parameter]
-    public int Id { get; set; }
+    [Parameter] public int Id { get; set; }
 
     private IncidentDto? incident;
     private bool loading = true;
     private bool isEditing = false;
 
-    protected override async Task OnInitializedAsync()
-    {
+    protected override async Task OnInitializedAsync() {
         await LoadIncident();
     }
 
-    private async Task LoadIncident()
-    {
+    private async Task LoadIncident() {
         loading = true;
-        try
-        {
+        try{
             incident = await Http.GetFromJsonAsync<IncidentDto>($"api/incidents/{Id}");
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex){
             Console.WriteLine($"Error loading incident: {ex.Message}");
         }
-        finally
-        {
+        finally{
             loading = false;
         }
     }
 
-    private void ToggleEdit()
-    {
+    private void ToggleEdit() {
         isEditing = true;
     }
 
-    private void CancelEdit()
-    {
+    private void CancelEdit() {
         isEditing = false;
         LoadIncident();
     }
 
-    private async Task SaveIncident()
-    {
-        try
-        {
+    private async Task SaveIncident() {
+        try{
             await Http.PutAsJsonAsync($"api/incidents/{Id}", incident);
             isEditing = false;
             await LoadIncident();
         }
-        catch (Exception ex)
-        {
+        catch (Exception ex){
             Console.WriteLine($"Error saving incident: {ex.Message}");
         }
     }
 
-    private void GoBack()
-    {
+    private void GoBack() {
         Navigation.NavigateTo("/incidents");
     }
 
-    public class IncidentDto
-    {
+    public class IncidentDto {
         public int Id { get; set; }
         public string Description { get; set; } = "";
         public DateTime CreatedAt { get; set; }
@@ -448,6 +478,19 @@
         public IncidentSeverity Severity { get; set; }
     }
 
-    public enum IncidentStatus { New, Open, InProgress, Resolved, Escalated }
-    public enum IncidentSeverity { Low, Medium, High, Critical }
+    public enum IncidentStatus {
+        New,
+        Open,
+        InProgress,
+        Resolved,
+        Escalated
+    }
+
+    public enum IncidentSeverity {
+        Low,
+        Medium,
+        High,
+        Critical
+    }
+
 }
